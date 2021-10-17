@@ -14,7 +14,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("ShadowEye")]
-[assembly: AssemblyCopyright("Copyright © 2014-2021 dhq_boiler")]
+[assembly: AssemblyCopyright("Copyright © 2021 dhq_boiler")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
