@@ -1,0 +1,7 @@
+*.suo
+libSevenTools/bin/
+libSevenTools/obj/
+VerificationTextBoxTest/bin/
+VerificationTextBoxTest/obj/
+ImageViewportTest/bin/
+ImageViewportTest/obj/

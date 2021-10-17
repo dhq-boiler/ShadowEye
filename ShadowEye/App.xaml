@@ -1,0 +1,10 @@
+﻿<Application x:Class="ShadowEye.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vp="clr-namespace:ShadowEye.Properties"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <vp:Resources x:Key="resources" />
+        <vp:Resource_Localization_Labels x:Key="resources_label" />
+    </Application.Resources>
+</Application>

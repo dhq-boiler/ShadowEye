@@ -1,0 +1,50 @@
+﻿<UserControl x:Class="libSevenTools.WPFControls.DecoratedSlider"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="70" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0">
+            <Label x:Name="Label_TitlePresentedValue"
+                   DockPanel.Dock="Left" />
+            <ToggleButton x:Name="ToggleButton_Auto"
+                          DockPanel.Dock="Left"
+                          FontSize="10"
+                          Width="20"
+                          Height="20">A</ToggleButton>
+            <Button x:Name="Button_Update"
+                    DockPanel.Dock="Left"
+                    FontSize="10"
+                    Width="20"
+                    Height="20"
+                    Click="Button_Update_Click">
+                <TextBlock FontFamily="Segoe UI Symbol"
+                           Text="&#xE117;" />
+            </Button>
+            <Label x:Name="Label_Value"
+                   DockPanel.Dock="Right" />
+            <Grid />
+        </DockPanel>
+        <Slider x:Name="Slider_PresentedValue"
+                Grid.Row="1"
+                TickPlacement="BottomRight"
+                AutoToolTipPlacement="BottomRight"
+                IsSnapToTickEnabled="True" />
+        <DockPanel Grid.Row="2">
+            <Label x:Name="Label_Minimum"
+                   DockPanel.Dock="Left"
+                   Content="{Binding ElementName=Slider_PresentedValue, Path=Minimum}" />
+            <Label x:Name="Label_Maximum"
+                   DockPanel.Dock="Right"
+                   Content="{Binding ElementName=Slider_PresentedValue, Path=Maximum}" />
+            <Grid />
+        </DockPanel>
+    </Grid>
+</UserControl>

@@ -1,0 +1,159 @@
+﻿<Window x:Class="ShadowEye.View.Dialogs.ScalingDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vvcc="clr-namespace:ShadowEye.View.Controls.Converter"
+        Closed="Window_Closed">
+    <Window.Resources>
+        <vvcc:StringToDoubleConverter x:Key="StringToDouble" />
+    </Window.Resources>
+    <Window.Title>
+        <Binding Mode="OneWay" Path="ScalingDialogTitle" Source="{StaticResource resources_label}"/>
+    </Window.Title>
+    <DockPanel>
+        <DockPanel DockPanel.Dock="Bottom">
+            <StackPanel DockPanel.Dock="Right"
+                        Orientation="Horizontal">
+                <Button Margin="10"
+                        Width="80"
+                        x:Name="ComputeButton"
+                        Content="{Binding ComputeButton, Mode=OneWay, Source={StaticResource resources_label}}"
+                        Click="ComputeButton_Click" />
+                <Button Margin="10"
+                        Width="80"
+                        x:Name="CancelButton"
+                        Content="{Binding Cancel, Mode=OneWay, Source={StaticResource resources_label}}"
+                        Click="CancelButton_Click" />
+            </StackPanel>
+            <Grid>
+                <Label HorizontalAlignment="Left" />
+            </Grid>
+        </DockPanel>
+        <DockPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <GroupBox Grid.Row="0"
+                          Margin="10"
+                          Header="{Binding TargetImage, Mode=OneWay, Source={StaticResource resources_label}}">
+                    <DockPanel>
+                        <ComboBox x:Name="ComboBox_Target"
+                                  DockPanel.Dock="Top"
+                                  Height="21"
+                                  ItemsSource="{Binding Items}"
+                                  SelectionChanged="ComboBox_Target_SelectionChanged" />
+                        <Image MaxWidth="200"
+                               MaxHeight="200"
+                               MinWidth="100"
+                               MinHeight="100"
+                               Source="{Binding ElementName=ComboBox_Target, Path=SelectedItem.Content.Bitmap}" />
+                    </DockPanel>
+                </GroupBox>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Grid.Column="0"
+                              Margin="10"
+                              Header="{Binding Options, Mode=OneWay, Source={StaticResource resources_label}}">
+                        <Grid Margin="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0"
+                                   Grid.Column="0"
+                                   Content="{Binding Unit, Mode=OneWay, Source={StaticResource resources_label}}"/>
+                            <Label Grid.Row="1"
+                                   Grid.Column="0"
+                                   Content="{Binding Width, Mode=OneWay, Source={StaticResource resources_label}}"/>
+                            <Label Grid.Row="2"
+                                   Grid.Column="0"
+                                   Content="{Binding Height, Mode=OneWay, Source={StaticResource resources_label}}"/>
+                            <TextBox Grid.Row="1"
+                                     Grid.Column="1"
+                                     Height="25"
+                                     Text="{Binding Width, Mode=TwoWay, Converter={StaticResource StringToDouble}}"
+                                     TextChanged="TextBox_TextChanged" />
+                            <TextBox Grid.Row="2"
+                                     Grid.Column="1"
+                                     Height="25"
+                                     Text="{Binding Height, Mode=TwoWay, Converter={StaticResource StringToDouble}}"
+                                     TextChanged="TextBox_TextChanged_1" />
+                            <Grid Grid.Row="0"
+                                  Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <RadioButton Grid.Column="0"
+                                             Margin="5"
+                                             IsChecked="{Binding SizeIsPercent}"
+                                             GroupName="Unit"
+                                             Checked="RadioButton_Checked"
+                                             Content="{Binding Percent, Mode=OneWay, Source={StaticResource resources_label}}"/>
+                                <RadioButton Grid.Column="1"
+                                             Margin="5"
+                                             IsChecked="True"
+                                             GroupName="Unit"
+                                             Checked="RadioButton_Checked_1"
+                                             Content="{Binding Pixel, Mode=OneWay, Source={StaticResource resources_label}}"/>
+                            </Grid>
+                            <CheckBox Grid.Row="3"
+                                      Grid.Column="0"
+                                      Grid.ColumnSpan="2"
+                                      IsChecked="{Binding KeepAspectRatio}"
+                                      Margin="5"
+                                      Content="{Binding KeepAspectRatio, Mode=OneWay, Source={StaticResource resources_label}}"/>
+                            <Label Grid.Row="4"
+                                   Grid.Column="0"
+                                   Content="" />
+                            <Button Grid.Row="4"
+                                    Grid.Column="1"
+                                    Margin="5"
+                                    Content="{Binding ReturnOriginalSize, Mode=OneWay, Source={StaticResource resources_label}}"
+                                    Click="Button_Click" />
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Grid.Column="1"
+                              Margin="10"
+                              Header="プロパティ">
+                        <Grid Margin="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0"
+                                   Grid.Column="0"
+                                   Content="{Binding Width, Mode=OneWay, Source={StaticResource resources_label}}"/>
+                            <Label Grid.Row="1"
+                                   Grid.Column="0"
+                                   Content="{Binding Height, Mode=OneWay, Source={StaticResource resources_label}}"/>
+                            <Label Grid.Row="0"
+                                   Grid.Column="1"
+                                   Content="{Binding ElementName=ComboBox_Target, Path=SelectedItem.Content.Bitmap.Width}" />
+                            <Label Grid.Row="1"
+                                   Grid.Column="1"
+                                   Content="{Binding ElementName=ComboBox_Target, Path=SelectedItem.Content.Bitmap.Height}" />
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </Grid>
+        </DockPanel>
+    </DockPanel>
+</Window>

@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="ShadowEye.View.Controls.MainMenu"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vvm="clr-namespace:ShadowEye.ViewModel"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             mc:Ignorable="d">
+    <Menu>
+        <MenuItem Header="{Binding FileMenu, Mode=OneWay, Source={StaticResource resources}}" />
+        <MenuItem Header="{Binding ImageProcessingMenu, Mode=OneWay, Source={StaticResource resources}}">
+            <MenuItem Command="vvm:RoutedCommands.ImageProcessing_SubtractionCommand" Header="{Binding ImageSubtraction, Mode=OneWay, Source={StaticResource resources}}" />
+            <MenuItem Command="vvm:RoutedCommands.ImageProcessing_MultiplicationCommand" Header="{Binding MultiplicationMenu, Mode=OneWay, Source={StaticResource resources}}" />
+            <Separator />
+            <MenuItem Command="vvm:RoutedCommands.ImageProcessing_IntegrateChannelCommand" Header="{Binding ChannelIntegrationMenu, Mode=OneWay, Source={StaticResource resources}}" />
+            <MenuItem Command="vvm:RoutedCommands.ImageProcessing_ExtractChannelCommand" Header="{Binding ChannelExtractionMenu, Mode=OneWay, Source={StaticResource resources}}" />
+            <Separator />
+            <MenuItem Command="vvm:RoutedCommands.ImageProcessing_ThresholdingCommand" Header="{Binding ThresholdingMenu, Mode=OneWay, Source={StaticResource resources}}" />
+            <MenuItem Command="vvm:RoutedCommands.ImageProcessing_ScalingCommand" Header="{Binding ScalingMenu, Mode=OneWay, Source={StaticResource resources}}" />
+            <MenuItem Command="vvm:RoutedCommands.ImageProcessing_ColorConversionCommand" Header="{Binding ColorConversionMenu, Mode=OneWay, Source={StaticResource resources}}" />
+        </MenuItem>
+        <MenuItem Header="Filter">
+            <MenuItem Command="vvm:RoutedCommands.Filter_EdgeExtractionCommand" Header="Edge Extraction" />
+        </MenuItem>
+    </Menu>
+</UserControl>

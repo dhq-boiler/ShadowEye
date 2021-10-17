@@ -1,0 +1,33 @@
+﻿<Window x:Class="ShadowEye.View.Dialogs.SelectCameraDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{Binding SelectCameraDialogTitle, Mode=OneWay, Source={StaticResource resources_label}}"
+        Height="300" Width="300">
+    <Window.Resources>
+        <Style TargetType="{x:Type ListBoxItem}">
+            <EventSetter Event="MouseDoubleClick" Handler="ListBoxItem_MouseDoubleClick" />
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <DockPanel>
+            <Label DockPanel.Dock="Top"
+               HorizontalAlignment="Left"
+                   Content="{Binding SelectCameraDialogText, Mode=OneWay, Source={StaticResource resources_label}}"/>
+            <UniformGrid DockPanel.Dock="Bottom"
+                         Rows="1" Columns="2">
+                <Button x:Name="Button_OK"
+                        Margin="10 5 10 5"
+                        Content="{Binding OK, Mode=OneWay, Source={StaticResource resources_label}}"
+                        Click="Button_OK_Click"/>
+                <Button x:Name="Button_Cancel"
+                        Margin="10 5 10 10"
+                        Content="{Binding Cancel, Mode=OneWay, Source={StaticResource resources_label}}"
+                        Click="Button_Cancel_Click"/>
+            </UniformGrid>
+            <ListBox ItemsSource="{Binding}"
+                     Margin="10"
+                     x:Name="ListBox_CameraDevices"
+                     SelectionMode="Single" />
+        </DockPanel>
+    </Grid>
+</Window>
