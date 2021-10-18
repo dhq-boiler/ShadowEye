@@ -80,7 +80,15 @@ namespace ShadowEye.ViewModel
 
         private static string GetExtensions()
         {
-            return "Windows Bitmaps|*.bmp;*.dib|JPEG files|*.jpg;*.jpeg;*.jpe|JPEG 2000 files|*.jp2|Portable Network Graphics files|*.png|WebP|*.webp|Sun rasters|*.sr;*.ras|TIFF files|*.tiff;*.tif|Radiance HDR|*.hdr;*.pic|All Files|*.*";
+            return "Windows Bitmaps|*.bmp;*.dib|" +
+                   "JPEG files|*.jpg;*.jpeg;*.jpe|" +
+                   "JPEG 2000 files|*.jp2|" +
+                   "Portable Network Graphics files|*.png|" +
+                   "WebP|*.webp|" +
+                   "Sun rasters|*.sr;*.ras|" +
+                   "TIFF files|*.tiff;*.tif|" +
+                   "Radiance HDR|*.hdr;*.pic|" +
+                   "All Files|*.*";
         }
 
         public void AddOrActive(AnalyzingSource source)
