@@ -1,0 +1,271 @@
+﻿<UserControl x:Class="libSevenTools.WPFControls.Imaging.ImageViewport"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:libSevenTools.WPFControls.Imaging"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:stc="clr-namespace:libSevenTools.WPFControls.Converter"
+             xmlns:stp="clr-namespace:libSevenTools.Properties"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <stp:Resource_ImageViewport x:Key="resources" />
+        <stc:TextScaleConverter x:Key="TextScaleConverter" />
+        <MenuItem x:Key="MenuItem_Uniform"
+                  Click="UniformButton_Click"
+                  Header="{Binding UniformedFill,
+                                   Mode=OneWay,
+                                   Source={StaticResource resources}}"
+                  x:Shared="false" />
+        <MenuItem x:Key="MenuItem_Enlarge"
+                  Header="{Binding Enlarge,
+                                   Mode=OneWay,
+                                   Source={StaticResource resources}}"
+                  x:Shared="false">
+            <MenuItem Click="Scale32" Header="3200%" />
+            <MenuItem Click="Scale31" Header="3100%" />
+            <MenuItem Click="Scale30" Header="3000%" />
+            <MenuItem Click="Scale29" Header="2900%" />
+            <MenuItem Click="Scale28" Header="2800%" />
+            <MenuItem Click="Scale27" Header="2700%" />
+            <MenuItem Click="Scale26" Header="2600%" />
+            <MenuItem Click="Scale25" Header="2500%" />
+            <MenuItem Click="Scale24" Header="2400%" />
+            <MenuItem Click="Scale23" Header="2300%" />
+            <MenuItem Click="Scale22" Header="2200%" />
+            <MenuItem Click="Scale21" Header="2100%" />
+            <MenuItem Click="Scale20" Header="2000%" />
+            <MenuItem Click="Scale19" Header="1900%" />
+            <MenuItem Click="Scale18" Header="1800%" />
+            <MenuItem Click="Scale17" Header="1700%" />
+            <MenuItem Click="Scale16" Header="1600%" />
+            <MenuItem Click="Scale15" Header="1500%" />
+            <MenuItem Click="Scale14" Header="1400%" />
+            <MenuItem Click="Scale13" Header="1300%" />
+            <MenuItem Click="Scale12" Header="1200%" />
+            <MenuItem Click="Scale11" Header="1100%" />
+            <MenuItem Click="Scale10" Header="1000%" />
+            <MenuItem Click="Scale9" Header="900%" />
+            <MenuItem Click="Scale8" Header="800%" />
+            <MenuItem Click="Scale7" Header="700%" />
+            <MenuItem Click="Scale6" Header="600%" />
+            <MenuItem Click="Scale5" Header="500%" />
+            <MenuItem Click="Scale4" Header="400%" />
+            <MenuItem Click="Scale3" Header="300%" />
+            <MenuItem Click="Scale2" Header="200%" />
+        </MenuItem>
+        <MenuItem x:Key="MenuItem_SameSize"
+                  Click="Scale1"
+                  Header="{Binding SameSize,
+                                   Mode=OneWay,
+                                   Source={StaticResource resources}}"
+                  x:Shared="false" />
+        <MenuItem x:Key="MenuItem_Reduce"
+                  Header="{Binding Reduce,
+                                   Mode=OneWay,
+                                   Source={StaticResource resources}}"
+                  x:Shared="false">
+            <MenuItem Click="Scale075" Header="75%" />
+            <MenuItem Click="Scale05" Header="50%" />
+            <MenuItem Click="Scale025" Header="25%" />
+            <MenuItem Click="Scale02" Header="20%" />
+            <MenuItem Click="Scale015" Header="15%" />
+            <MenuItem Click="Scale01" Header="10%" />
+            <MenuItem Click="Scale005" Header="5%" />
+            <MenuItem Click="Scale0025" Header="2.5%" />
+            <MenuItem Click="Scale002" Header="2.0%" />
+            <MenuItem Click="Scale0015" Header="1.5%" />
+            <MenuItem Click="Scale001" Header="1.0%" />
+            <MenuItem Click="Scale0005" Header="0.5%" />
+        </MenuItem>
+        <ContextMenu x:Key="ContextMenu_ScaleFactor">
+            <StaticResourceExtension ResourceKey="MenuItem_Uniform" />
+            <StaticResourceExtension ResourceKey="MenuItem_Enlarge" />
+            <StaticResourceExtension ResourceKey="MenuItem_SameSize" />
+            <StaticResourceExtension ResourceKey="MenuItem_Reduce" />
+        </ContextMenu>
+        <ContextMenu x:Key="ContextMenu_Viewport">
+            <MenuItem Header="スケール">
+                <StaticResourceExtension ResourceKey="MenuItem_Uniform" />
+                <StaticResourceExtension ResourceKey="MenuItem_Enlarge" />
+                <StaticResourceExtension ResourceKey="MenuItem_SameSize" />
+                <StaticResourceExtension ResourceKey="MenuItem_Reduce" />
+            </MenuItem>
+            <MenuItem Header="補間方法">
+                <MenuItem x:Name="MenuItem_NearestNeighbor"
+                          Click="SwitchInterpolationToNearestNeighbor"
+                          Header="NearestNeighbor"
+                          Loaded="MenuItem_NearestNeighbor_Loaded" />
+                <MenuItem x:Name="MenuItem_Bilinear"
+                          Click="SwitchInterpolationToBilinear"
+                          Header="Bilinear"
+                          Loaded="MenuItem_Bilinear_Loaded" />
+                <MenuItem x:Name="MenuItem_Bicubic"
+                          Click="SwitchInterpolationToBicubic"
+                          Header="Bicubic"
+                          Loaded="MenuItem_Bicubic_Loaded" />
+            </MenuItem>
+        </ContextMenu>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="20" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="20" />
+        </Grid.ColumnDefinitions>
+        <Grid x:Name="Grid_RenderArea"
+              Grid.Row="0"
+              Grid.Column="0"
+              SizeChanged="Grid_RenderArea_SizeChanged">
+            <Grid.Background>
+                <SolidColorBrush Color="Gray" />
+            </Grid.Background>
+            <Grid x:Name="Grid_Background"
+                  Width="{Binding ActualWidth,
+                                  ElementName=Image_RenderArea,
+                                  Mode=OneWay}"
+                  Height="{Binding ActualHeight,
+                                   ElementName=Image_RenderArea,
+                                   Mode=OneWay}">
+                <Grid.Style>
+                    <Style TargetType="{x:Type Grid}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ShowTransparentGrid, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:ImageViewport}}}">
+                                <DataTrigger.Value>
+                                    <sys:Boolean>True</sys:Boolean>
+                                </DataTrigger.Value>
+                                <DataTrigger.Setters>
+                                    <Setter Property="Background">
+                                        <Setter.Value>
+                                            <DrawingBrush TileMode="Tile"
+                                                          Viewport="0,0,20,20"
+                                                          ViewportUnits="Absolute">
+                                                <DrawingBrush.Drawing>
+                                                    <DrawingGroup>
+                                                        <GeometryDrawing Brush="#999999">
+                                                            <GeometryDrawing.Geometry>
+                                                                <GeometryGroup>
+                                                                    <RectangleGeometry Rect="0,0,10,10" />
+                                                                    <RectangleGeometry Rect="10,10,10,10" />
+                                                                </GeometryGroup>
+                                                            </GeometryDrawing.Geometry>
+                                                        </GeometryDrawing>
+                                                        <GeometryDrawing Brush="#666666">
+                                                            <GeometryDrawing.Geometry>
+                                                                <GeometryGroup>
+                                                                    <RectangleGeometry Rect="10,0,10,10" />
+                                                                    <RectangleGeometry Rect="0,10,10,10" />
+                                                                </GeometryGroup>
+                                                            </GeometryDrawing.Geometry>
+                                                        </GeometryDrawing>
+                                                    </DrawingGroup>
+                                                </DrawingBrush.Drawing>
+                                            </DrawingBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger.Setters>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding ShowTransparentGrid, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:ImageViewport}}}">
+                                <DataTrigger.Value>
+                                    <sys:Boolean>False</sys:Boolean>
+                                </DataTrigger.Value>
+                                <DataTrigger.Setters>
+                                    <Setter Property="Background" Value="Transparent" />
+                                </DataTrigger.Setters>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+            </Grid>
+            <Image x:Name="Image_RenderArea"
+                   ContextMenu="{StaticResource ContextMenu_Viewport}"
+                   FocusVisualStyle="{x:Null}"
+                   Focusable="True"
+                   MouseDown="Image_RenderArea_MouseDown"
+                   MouseMove="Image_RenderArea_MouseMove"
+                   MouseUp="Image_RenderArea_MouseUp"
+                   MouseWheel="Image_RenderArea_MouseWheel"
+                   SnapsToDevicePixels="True"
+                   Source="{Binding RenderBitmap,
+                                    RelativeSource={RelativeSource FindAncestor,
+                                                                   AncestorType={x:Type local:ImageViewport}}}" />
+        </Grid>
+        <ScrollBar Grid.Row="0"
+                   Grid.Column="1"
+                   Width="20"
+                   LargeChange="{Binding RenderingSizePerPixel,
+                                         Mode=OneWay,
+                                         RelativeSource={RelativeSource FindAncestor,
+                                                                        AncestorType={x:Type local:ImageViewport}}}"
+                   Maximum="{Binding VerticalMaxValue,
+                                     RelativeSource={RelativeSource FindAncestor,
+                                                                    AncestorType={x:Type local:ImageViewport}}}"
+                   Minimum="{Binding VerticalMinValue,
+                                     RelativeSource={RelativeSource FindAncestor,
+                                                                    AncestorType={x:Type local:ImageViewport}}}"
+                   Orientation="Vertical"
+                   SmallChange="1"
+                   Value="{Binding OffsetY,
+                                   Mode=TwoWay,
+                                   RelativeSource={RelativeSource FindAncestor,
+                                                                  AncestorType={x:Type local:ImageViewport}}}" />
+        <Grid Grid.Row="1" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="70" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="TextBox_Scale"
+                     Grid.Column="0"
+                     Height="20"
+                     Margin="0"
+                     HorizontalContentAlignment="Center"
+                     VerticalContentAlignment="Center"
+                     ContextMenu="{StaticResource ResourceKey=ContextMenu_ScaleFactor}"
+                     FontSize="11"
+                     GotKeyboardFocus="TextBox_Scale_GotKeyboardFocus"
+                     KeyDown="TextBox_Scale_KeyDown"
+                     Text="{Binding Scale,
+                                    Converter={StaticResource TextScaleConverter},
+                                    Mode=TwoWay,
+                                    RelativeSource={RelativeSource FindAncestor,
+                                                                   AncestorType={x:Type local:ImageViewport}},
+                                    UpdateSourceTrigger=LostFocus}"
+                     ToolTip="{Binding ToolTip_TextBox_Scale,
+                                       Mode=OneWay,
+                                       Source={StaticResource resources}}" />
+            <ScrollBar Grid.Column="1"
+                       Height="20"
+                       LargeChange="{Binding RenderingSizePerPixel,
+                                             Mode=OneWay,
+                                             RelativeSource={RelativeSource FindAncestor,
+                                                                            AncestorType={x:Type local:ImageViewport}}}"
+                       Maximum="{Binding HorizontalMaxValue,
+                                         RelativeSource={RelativeSource FindAncestor,
+                                                                        AncestorType={x:Type local:ImageViewport}}}"
+                       Minimum="{Binding HorizontalMinValue,
+                                         RelativeSource={RelativeSource FindAncestor,
+                                                                        AncestorType={x:Type local:ImageViewport}}}"
+                       Orientation="Horizontal"
+                       SmallChange="1"
+                       Value="{Binding OffsetX,
+                                       Mode=TwoWay,
+                                       RelativeSource={RelativeSource FindAncestor,
+                                                                      AncestorType={x:Type local:ImageViewport}}}" />
+        </Grid>
+        <Grid Grid.Row="1" Grid.Column="1">
+            <Button Click="UniformButton_Click"
+                    IsTabStop="False"
+                    Padding="0"
+                    ToolTip="{Binding ToolTip_UniformButton,
+                                      Mode=OneWay,
+                                      Source={StaticResource resources}}">
+                <Image x:Name="Image_Uniform" />
+            </Button>
+        </Grid>
+    </Grid>
+</UserControl>

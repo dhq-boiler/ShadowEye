@@ -9,12 +9,12 @@ using System.Windows;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ShadowEye Computer Vision Tools")]
+[assembly: AssemblyTitle("ShadowEye Computer Vision Tool")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("ShadowEye")]
-[assembly: AssemblyCopyright("Copyright © 2014-2021 dhq_boiler")]
+[assembly: AssemblyCopyright("Copyright © 2021 dhq_boiler")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
