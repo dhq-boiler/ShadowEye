@@ -405,10 +405,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SevenTools\libSevenTools\libSevenTools.csproj">
-      <Project>{5fd54443-7e31-4cc6-ab88-11c2bb9972f0}</Project>
-      <Name>libSevenTools</Name>
-    </ProjectReference>
     <ProjectReference Include="..\imganal\imganal.csproj">
       <Project>{f46f9820-368c-44db-ac2e-238cf7b63c3b}</Project>
       <Name>imganal</Name>
@@ -420,6 +416,10 @@
     <ProjectReference Include="..\libimgeng\libimgeng.csproj">
       <Project>{eae74e58-61c6-45b6-8aee-ce4d440bb408}</Project>
       <Name>libimgeng</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\libSevenTools\libSevenTools.csproj">
+      <Project>{5fd54443-7e31-4cc6-ab88-11c2bb9972f0}</Project>
+      <Name>libSevenTools</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
