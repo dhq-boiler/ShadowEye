@@ -52,8 +52,8 @@ namespace ShadowEye.ViewModel
         {
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.FileName = source.Name;
-            dialog.DefaultExt = "bmp";
-            dialog.Filter = "Microsoft Windows Bitmap Image|*.bmp|All Files|*.*";
+            dialog.DefaultExt = "jpg";
+            dialog.Filter = GetExtensions();
             if (dialog.ShowDialog() == true)
             {
                 source.Mat.SaveImage(dialog.FileName);
@@ -70,12 +70,17 @@ namespace ShadowEye.ViewModel
 
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.FileName = ivm.Source.Name;
-            dialog.DefaultExt = "bmp";
-            dialog.Filter = "Microsoft Windows Bitmap Image|*.bmp|All Files|*.*";
+            dialog.DefaultExt = "jpg";
+            dialog.Filter = GetExtensions();
             if (dialog.ShowDialog() == true)
             {
                 ivm.Source.Mat.SaveImage(dialog.FileName);
             }
+        }
+
+        private static string GetExtensions()
+        {
+            return "Windows Bitmaps|*.bmp;*.dib|JPEG files|*.jpg;*.jpeg;*.jpe|JPEG 2000 files|*.jp2|Portable Network Graphics files|*.png|WebP|*.webp|Sun rasters|*.sr;*.ras|TIFF files|*.tiff;*.tif|Radiance HDR|*.hdr;*.pic|All Files|*.*";
         }
 
         public void AddOrActive(AnalyzingSource source)
