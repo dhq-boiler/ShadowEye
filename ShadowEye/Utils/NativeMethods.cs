@@ -3,6 +3,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows;
 
 namespace ShadowEye.Utils
 {
@@ -26,6 +27,17 @@ namespace ShadowEye.Utils
             public int right;
             public int bottom;
         }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT
+        {
+            public int x;
+            public int y;
+        }
+
+        [DllImport("user32.dll")]
+        public static extern bool ClientToScreen(IntPtr hwnd, out POINT lpPoint);
+
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
@@ -54,6 +66,8 @@ namespace ShadowEye.Utils
 
         [DllImport("user32.dll", EntryPoint = "GetWindowDC")]
         public static extern IntPtr GetWindowDC(IntPtr hWnd);
+
+        public const uint PW_CLIENTONLY = 0x00000001;
 
         [DllImport("user32.dll")]
         public extern static bool PrintWindow(IntPtr hwnd, IntPtr hDC, uint nFlags);
@@ -85,6 +99,20 @@ namespace ShadowEye.Utils
         public delegate int EnumerateWindowsCallback(IntPtr hWnd, int lParam);
 
         public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Rect
+        {
+            public int left;
+            public int top;
+            public int right;
+            public int bottom;
+        }
+
+        public const int DWMWA_EXTENDED_FRAME_BOUNDS = 9;
+
+        [DllImport("dwmapi.dll")]
+        public extern static int DwmGetWindowAttribute(IntPtr hWnd, int dwAttribute, out Rect rect, int cbAttribute);
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
         public struct DISPLAY_DEVICE
