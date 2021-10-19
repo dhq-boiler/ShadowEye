@@ -1,10 +1,10 @@
 ﻿
 
+using ShadowEye.Model;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using ShadowEye.Model;
 using static ShadowEye.Utils.NativeMethods;
 
 namespace ShadowEye.Utils
@@ -117,19 +117,16 @@ namespace ShadowEye.Utils
                 Graphics g = null;
                 try
                 {
-                    winDC = GetWindowDC(hWnd);
-                    RECT clientRect = new RECT();
-                    GetClientRect(hWnd, ref clientRect);
-
+                    winDC = GetDC(hWnd);
+                    RECT rect = new RECT();
+                    GetClientRect(hWnd, ref rect);
                     //Bitmapの作成
-                    Bitmap bmp = new Bitmap(clientRect.right - clientRect.left,
-                        clientRect.bottom - clientRect.top);
+                    Bitmap bmp = new Bitmap(rect.right - rect.left,
+                        rect.bottom - rect.top);
                     //Graphicsの作成
                     g = Graphics.FromImage(bmp);
                     //Graphicsのデバイスコンテキストを取得
                     hDC = g.GetHdc();
-
-                    PrintWindow(hWnd, hDC, 0);
                     //Bitmapに画像をコピーする
                     BitBlt(hDC, 0, 0, bmp.Width, bmp.Height,
                         winDC, 0, 0, SRCCOPY);
