@@ -4,7 +4,7 @@
 
 1. カメラをクリックします。
 2. カメラデバイスの選択ダイアログで入力したいWebカメラデバイスを選択し、ダブルクリックするかOKボタンを押下します。
-3. メインワークベンチ領域に選択したWebカメラの入力画像が逐次入力されます。
+3. メインワークベンチ領域に選択したWebカメラの入力画像が逐次出力されます。
 
 ![input_from_webcam](https://github.com/dhq-boiler/ShadowEye/blob/develop/WebComponents/input_from_webcam.gif)
 
@@ -12,6 +12,6 @@
 
 1. ファイルをクリックします。
 2. 開くダイアログで入力したい画像ファイルを選択します。
-3. メインワークベンチ領域に選択した画像ファイルが入力されます。
+3. メインワークベンチ領域に選択した画像ファイルが出力されます。
 
 ![input_from_jpg_file](https://github.com/dhq-boiler/ShadowEye/blob/develop/WebComponents/input_from_jpg_file.gif)
