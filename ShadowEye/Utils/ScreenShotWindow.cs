@@ -88,9 +88,12 @@ namespace ShadowEye.Utils
                 }
                 finally
                 {
-                    //解放
-                    g.ReleaseHdc(hDC);
-                    g.Dispose();
+                    if (g != null)
+                    {
+                        //解放
+                        g.ReleaseHdc(hDC);
+                        g.Dispose();
+                    }
                     ReleaseDC(hWnd, winDC);
                 }
             }
@@ -135,9 +138,12 @@ namespace ShadowEye.Utils
                 }
                 finally
                 {
-                    //解放
-                    g.ReleaseHdc(hDC);
-                    g.Dispose();
+                    if (g != null)
+                    {
+                        //解放
+                        g.ReleaseHdc(hDC);
+                        g.Dispose();
+                    }
                     ReleaseDC(hWnd, winDC);
                 }
             }
