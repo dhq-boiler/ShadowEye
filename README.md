@@ -24,6 +24,10 @@ ShadowEye を動作させるには .NET Framework 4.8 が必要です。
  3. 展開したフォルダを安全な場所に配置します。
  4. 配置したフォルダ内の ShadowEye.exe を実行します。
 
+# How to use
+
+[How to use](https://github.com/dhq-boiler/ShadowEye/blob/develop/HowToUse.md)
+
 # Author
 
 * [@dhq_boiler](https://twitter.com/dhq_boiler)
