@@ -38,6 +38,7 @@ namespace ShadowEye.Model
                 {
                     Mat = Frames[CurrentIndex.Value].Item1;
                     SetBitmapFromMat(Mat);
+                    OnSourceUpdated(this, new EventArgs());
                 }
             })
             .AddTo(disposables);
@@ -90,6 +91,7 @@ namespace ShadowEye.Model
             {
                 TargetSource.Value.UpdateImage();
                 Mat = TargetSource.Value.Mat.Clone();
+                OnSourceUpdated(this, new EventArgs());
                 Frames.Add(new Tuple<Mat, TimeSpan>(Mat, (_previousRecordDateTime != null ? DateTime.Now - _previousRecordDateTime : TimeSpan.Zero)));
                 _previousRecordDateTime = DateTime.Now;
                 CurrentIndex.Value++;
