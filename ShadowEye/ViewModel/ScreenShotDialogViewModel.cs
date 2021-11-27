@@ -69,6 +69,9 @@ namespace ShadowEye.ViewModel
                 case PictureOrMovie.Movie:
                     _ScreenShotSource.HowToUpdate = new DynamicUpdater(_ScreenShotSource);
                     break;
+                case PictureOrMovie.Film:
+                    _ScreenShotSource.HowToUpdate = new ManualUpdater(_ScreenShotSource);
+                    break;
             }
 
             _ScreenShotSource.HowToUpdate.Request();
@@ -204,8 +207,14 @@ namespace ShadowEye.ViewModel
 
         public void AddComputeTab()
         {
-            var source = _ScreenShotSource;
-            source.SetName(string.Format("ScreenShot-{0}", ++s_createCount));
+            var source = (AnalyzingSource)new DummySource();
+            source = _ScreenShotSource;
+            source.Name = string.Format("ScreenShot-{0}", ++s_createCount);
+            if (CapturingType == PictureOrMovie.Film)
+            {
+                source = new FilmSource($"Film-{++s_createCount}", source);
+                (source as FilmSource).StartRecoding();
+            }
             MainWorkbenchVM.AddOrActive(source);
         }
 
@@ -222,7 +231,8 @@ namespace ShadowEye.ViewModel
         {
             Unknown,
             Picture,
-            Movie
+            Movie,
+            Film,
         }
     }
 }

@@ -1,54 +1,82 @@
-﻿<UserControl
-    x:Class="ShadowEye.View.Controls.MainWorkbench"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:sti="clr-namespace:libSevenTools.WPFControls.Imaging;assembly=libSevenTools"
-    xmlns:vvc="clr-namespace:ShadowEye.View.Controls"
-    xmlns:vvm="clr-namespace:ShadowEye.ViewModel"
-    d:DesignHeight="300"
-    d:DesignWidth="300"
-    vvm:CommandSinkBinding.CommandSink="{Binding}"
-    AllowDrop="True"
-    DataContext="{Binding}"
-    Drop="UserControl_Drop"
-    mc:Ignorable="d">
+﻿<UserControl x:Class="ShadowEye.View.Controls.MainWorkbench"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converter="clr-namespace:ShadowEye.View.Controls.Converter"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:model="clr-namespace:ShadowEye.Model"
+             xmlns:sti="clr-namespace:libSevenTools.WPFControls.Imaging;assembly=libSevenTools"
+             xmlns:vvc="clr-namespace:ShadowEye.View.Controls"
+             xmlns:vvm="clr-namespace:ShadowEye.ViewModel"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             vvm:CommandSinkBinding.CommandSink="{Binding}"
+             AllowDrop="True"
+             DataContext="{Binding}"
+             Drop="UserControl_Drop"
+             mc:Ignorable="d">
     <UserControl.CommandBindings>
         <vvm:CommandSinkBinding Command="vvm:RoutedCommands.StoreDiscadedImageCommand" />
         <vvm:CommandSinkBinding Command="vvm:RoutedCommands.SaveAsCommand" />
         <vvm:CommandSinkBinding Command="vvm:RoutedCommands.CloseThisTabCommand" />
     </UserControl.CommandBindings>
     <UserControl.Resources>
+        <converter:TypeOfConverter x:Key="TypeOf" />
+        <converter:IfTypeIsFilmSourceThanReturnVisibleConverter x:Key="IfTypeIsFilmSource" />
         <Style TargetType="{x:Type TabItem}">
             <Setter Property="ContentTemplate">
                 <Setter.Value>
                     <DataTemplate DataType="{x:Type vvm:ImageViewModel}">
-                        <sti:ImageViewport
-                            Interpolation="Bilinear"
-                            PixelPointed="ImageViewport_PixelPointed"
-                            ShowTransparentGrid="True"
-                            Source="{Binding Mode=OneWay, Path=Source.Bitmap}" />
+                        <DockPanel>
+                            <DockPanel x:Name="StopRecordingButtonPanel"
+                                       DockPanel.Dock="Bottom"
+                                       Visibility="{Binding Source, Converter={StaticResource IfTypeIsFilmSource}}">
+                                <Button Width="30"
+                                        Height="30"
+                                        Command="{Binding Source.StopRecordingCommand}">
+                                    <Button.ContentTemplate>
+                                        <DataTemplate DataType="Button">
+                                            <Rectangle Width="20"
+                                                       Height="20"
+                                                       Fill="Black" />
+                                        </DataTemplate>
+                                    </Button.ContentTemplate>
+                                </Button>
+                                <DockPanel DockPanel.Dock="Right">
+                                    <TextBox Text="{Binding Source.CurrentIndex.Value, Mode=TwoWay}" />
+                                    <TextBlock>
+                                        <Run Text="/" />
+                                        <Run Text="{Binding Source.Frames.Count, Mode=OneWay}" />
+                                    </TextBlock>
+                                </DockPanel>
+                                <Slider IsSnapToTickEnabled="True"
+                                        Maximum="{Binding Source.Frames.Count}"
+                                        Minimum="1"
+                                        TickFrequency="1"
+                                        Value="{Binding Source.CurrentIndex.Value}" />
+                            </DockPanel>
+                            <sti:ImageViewport Interpolation="Bilinear"
+                                               PixelPointed="ImageViewport_PixelPointed"
+                                               ShowTransparentGrid="True"
+                                               Source="{Binding Mode=OneWay, Path=Source.Bitmap}" />
+                        </DockPanel>
                     </DataTemplate>
                 </Setter.Value>
             </Setter>
             <Setter Property="ContextMenu">
                 <Setter.Value>
                     <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                        <MenuItem
-                            Command="vvm:RoutedCommands.StoreDiscadedImageCommand"
-                            CommandParameter="{Binding}"
-                            Header="Store Discading Image" />
+                        <MenuItem Command="vvm:RoutedCommands.StoreDiscadedImageCommand"
+                                  CommandParameter="{Binding}"
+                                  Header="Store Discading Image" />
                         <Separator />
-                        <MenuItem
-                            Command="vvm:RoutedCommands.SaveAsCommand"
-                            CommandParameter="{Binding}"
-                            Header="Save As..." />
+                        <MenuItem Command="vvm:RoutedCommands.SaveAsCommand"
+                                  CommandParameter="{Binding}"
+                                  Header="Save As..." />
                         <Separator />
-                        <MenuItem
-                            Command="vvm:RoutedCommands.CloseThisTabCommand"
-                            CommandParameter="{Binding}"
-                            Header="Close" />
+                        <MenuItem Command="vvm:RoutedCommands.CloseThisTabCommand"
+                                  CommandParameter="{Binding}"
+                                  Header="Close" />
                     </ContextMenu>
                 </Setter.Value>
             </Setter>
@@ -77,32 +105,30 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <StackPanel Grid.Row="0" Orientation="Horizontal">
-                                <Label
-                                    Name="Label_TabTitle"
-                                    Height="25"
-                                    Margin="4,1,0,0"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Top"
-                                    Content="{Binding Header}"
-                                    FontFamily="Meiryo UI"
-                                    FontSize="12" />
-                                <Button
-                                    Name="Button_close"
-                                    Width="20"
-                                    Height="19"
-                                    Margin="0,3,4,0"
-                                    Padding="0"
-                                    HorizontalAlignment="Right"
-                                    VerticalAlignment="Top"
-                                    Click="Button_Close_Click"
-                                    Content="X"
-                                    FontFamily="Meiryo UI"
-                                    FontSize="14"
-                                    FontStretch="Normal"
-                                    FontWeight="Bold"
-                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                    ToolTip="Close"
-                                    Visibility="Visible" />
+                                <Label Name="Label_TabTitle"
+                                       Height="25"
+                                       Margin="4,1,0,0"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Top"
+                                       Content="{Binding Header}"
+                                       FontFamily="Meiryo UI"
+                                       FontSize="12" />
+                                <Button Name="Button_close"
+                                        Width="20"
+                                        Height="19"
+                                        Margin="0,3,4,0"
+                                        Padding="0"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        Click="Button_Close_Click"
+                                        Content="X"
+                                        FontFamily="Meiryo UI"
+                                        FontSize="14"
+                                        FontStretch="Normal"
+                                        FontWeight="Bold"
+                                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                        ToolTip="Close"
+                                        Visibility="Visible" />
                             </StackPanel>
                         </Grid>
                     </DataTemplate>
@@ -110,10 +136,9 @@
             </Setter>
         </Style>
     </UserControl.Resources>
-    <TabControl
-        x:Name="TabControl_Workbench"
-        ItemsSource="{Binding Tabs}"
-        SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}"
-        SelectedItem="{Binding SelectedImageVM, Mode=TwoWay}"
-        SelectionChanged="TabControl_Workbench_SelectionChanged" />
+    <TabControl x:Name="TabControl_Workbench"
+                ItemsSource="{Binding Tabs}"
+                SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}"
+                SelectedItem="{Binding SelectedImageVM, Mode=TwoWay}"
+                SelectionChanged="TabControl_Workbench_SelectionChanged" />
 </UserControl>

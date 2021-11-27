@@ -89,10 +89,5 @@ namespace ShadowEye.Model
                     _timer.Stop();
             }
         }
-
-        public void SetName(string name)
-        {
-            Name = name;
-        }
     }
 }

@@ -385,6 +385,15 @@ namespace ShadowEye.Properties {
         }
         
         /// <summary>
+        ///   Film に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ScreenShotCapturingFilm {
+            get {
+                return ResourceManager.GetString("ScreenShotCapturingFilm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Moving Image に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string ScreenShotCapturingMoving {
