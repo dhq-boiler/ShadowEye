@@ -35,90 +35,60 @@
                         Width="80"
                         Margin="10"
                         Click="ShootButton_Click"
-                        Content="{Binding ScreenShotShootButton,
-                                          Mode=OneWay,
-                                          Source={StaticResource resources_label}}" />
+                        Content="{Binding ScreenShotShootButton, Mode=OneWay, Source={StaticResource resources_label}}" />
                 <Button x:Name="CancelButton"
                         Width="80"
                         Margin="10"
                         Click="CancelButton_Click"
-                        Content="{Binding Cancel,
-                                          Mode=OneWay,
-                                          Source={StaticResource resources_label}}" />
+                        Content="{Binding Cancel, Mode=OneWay, Source={StaticResource resources_label}}" />
             </StackPanel>
             <Grid DockPanel.Dock="Left">
                 <Button x:Name="SaveFileButton"
                         Width="80"
                         Margin="10"
                         Click="SaveFileButton_Click"
-                        Content="{Binding SaveDialogOpenText,
-                                          Mode=OneWay,
-                                          Source={StaticResource resources_label}}" />
+                        Content="{Binding SaveDialogOpenText, Mode=OneWay, Source={StaticResource resources_label}}" />
             </Grid>
             <Label />
         </DockPanel>
         <GroupBox Header="{Binding ScreenShotTarget, Mode=OneWay, Source={StaticResource resources_label}}">
             <StackPanel DockPanel.Dock="Left">
-                <RadioButton Content="{Binding ScreenShotTargetEntireVirtualScreen,
-                                               Mode=OneWay,
-                                               Source={StaticResource resources_label}}"
+                <RadioButton Content="{Binding ScreenShotTargetEntireVirtualScreen, Mode=OneWay, Source={StaticResource resources_label}}"
                              GroupName="ScreenShotTarget"
-                             IsChecked="{Binding Target,
-                                                 Converter={StaticResource ScreenshotTargetToBoolConverter},
-                                                 ConverterParameter=VirtualScreen}" />
+                             IsChecked="{Binding Target, Converter={StaticResource ScreenshotTargetToBoolConverter}, ConverterParameter=VirtualScreen}" />
                 <GroupBox>
                     <GroupBox.Header>
-                        <RadioButton Content="{Binding ScreenShotTargetScreen,
-                                                       Mode=OneWay,
-                                                       Source={StaticResource resources_label}}"
+                        <RadioButton Content="{Binding ScreenShotTargetScreen, Mode=OneWay, Source={StaticResource resources_label}}"
                                      GroupName="ScreenShotTarget"
-                                     IsChecked="{Binding Target,
-                                                         Converter={StaticResource ScreenshotTargetToBoolConverter},
-                                                         ConverterParameter=Screen}" />
+                                     IsChecked="{Binding Target, Converter={StaticResource ScreenshotTargetToBoolConverter}, ConverterParameter=Screen}" />
                     </GroupBox.Header>
                     <DockPanel>
                         <Label VerticalAlignment="Center"
-                               Content="{Binding ScreenShotTargetScreenLabel,
-                                                 Mode=OneWay,
-                                                 Source={StaticResource resources_label}}"
+                               Content="{Binding ScreenShotTargetScreenLabel, Mode=OneWay, Source={StaticResource resources_label}}"
                                DockPanel.Dock="Left" />
                         <ComboBox x:Name="ComboBox_SelectScreen"
-                                  IsEnabled="{Binding Header.IsChecked,
-                                                      RelativeSource={RelativeSource AncestorType=GroupBox,
-                                                                                     AncestorLevel=1}}"
+                                  IsEnabled="{Binding Header.IsChecked, RelativeSource={RelativeSource AncestorType=GroupBox, AncestorLevel=1}}"
                                   ItemsSource="{Binding Monitors}"
                                   SelectionChanged="ComboBox_SelectScreen_SelectionChanged" />
                     </DockPanel>
                 </GroupBox>
-                <RadioButton Content="{Binding ScreenShotTargetDesktop,
-                                               Mode=OneWay,
-                                               Source={StaticResource resources_label}}"
+                <RadioButton Content="{Binding ScreenShotTargetDesktop, Mode=OneWay, Source={StaticResource resources_label}}"
                              GroupName="ScreenShotTarget"
-                             IsChecked="{Binding Target,
-                                                 Converter={StaticResource ScreenshotTargetToBoolConverter},
-                                                 ConverterParameter=Desktop}" />
+                             IsChecked="{Binding Target, Converter={StaticResource ScreenshotTargetToBoolConverter}, ConverterParameter=Desktop}" />
                 <GroupBox>
                     <GroupBox.Header>
-                        <RadioButton Content="{Binding ScreenShotTargetWindow,
-                                                       Mode=OneWay,
-                                                       Source={StaticResource resources_label}}"
+                        <RadioButton Content="{Binding ScreenShotTargetWindow, Mode=OneWay, Source={StaticResource resources_label}}"
                                      GroupName="ScreenShotTarget"
-                                     IsChecked="{Binding Target,
-                                                         Converter={StaticResource ScreenshotTargetToBoolConverter},
-                                                         ConverterParameter=Window}" />
+                                     IsChecked="{Binding Target, Converter={StaticResource ScreenshotTargetToBoolConverter}, ConverterParameter=Window}" />
                     </GroupBox.Header>
                     <StackPanel>
                         <DockPanel>
                             <Label VerticalAlignment="Center"
-                                   Content="{Binding ScreenShotTargetWindowProcessLabel,
-                                                     Mode=OneWay,
-                                                     Source={StaticResource resources_label}}"
+                                   Content="{Binding ScreenShotTargetWindowProcessLabel, Mode=OneWay, Source={StaticResource resources_label}}"
                                    DockPanel.Dock="Left" />
                             <ComboBox x:Name="ComboBox_SelectProcess"
                                       DropDownOpened="ComboBox_SelectProcess_DropDownOpened"
-                                      IsEnabled="{Binding Header.IsChecked,
-                                                          RelativeSource={RelativeSource AncestorType=GroupBox,
-                                                                                         AncestorLevel=1}}"
+                                      IsEnabled="{Binding Header.IsChecked, RelativeSource={RelativeSource AncestorType=GroupBox, AncestorLevel=1}}"
                                       IsEnabledChanged="ComboBox_SelectProcess_IsEnabledChanged"
                                       ItemsSource="{Binding Processes}"
                                       SelectedItem="{Binding SelectedProcess}"
@@ -135,13 +105,9 @@
                                       SelectedItem="{Binding SelectedWindowInfo}"
                                       SelectionChanged="ComboBox_SelectWindow_SelectionChanged" />
                         </DockPanel>
-                        <CheckBox Content="{Binding ScreenShotTargetWindowOnlyClientArea,
-                                                    Mode=OneWay,
-                                                    Source={StaticResource resources_label}}"
+                        <CheckBox Content="{Binding ScreenShotTargetWindowOnlyClientArea, Mode=OneWay, Source={StaticResource resources_label}}"
                                   IsChecked="{Binding OnlyClientArea}"
-                                  IsEnabled="{Binding Header.IsChecked,
-                                                      RelativeSource={RelativeSource AncestorType=GroupBox,
-                                                                                     AncestorLevel=1}}" />
+                                  IsEnabled="{Binding Header.IsChecked, RelativeSource={RelativeSource AncestorType=GroupBox, AncestorLevel=1}}" />
                     </StackPanel>
                 </GroupBox>
             </StackPanel>
@@ -150,20 +116,15 @@
             <DockPanel DockPanel.Dock="Bottom">
                 <GroupBox Header="{Binding ScreenShotCapturing, Mode=OneWay, Source={StaticResource resources_label}}">
                     <StackPanel Orientation="Horizontal">
-                        <RadioButton Content="{Binding ScreenShotCapturingStill,
-                                                       Mode=OneWay,
-                                                       Source={StaticResource resources_label}}"
+                        <RadioButton Content="{Binding ScreenShotCapturingStill, Mode=OneWay, Source={StaticResource resources_label}}"
                                      GroupName="CapturingType"
-                                     IsChecked="{Binding CapturingType,
-                                                         Converter={StaticResource PictureOrMovieToBoolConverter},
-                                                         ConverterParameter=Picture}" />
-                        <RadioButton Content="{Binding ScreenShotCapturingMoving,
-                                                       Mode=OneWay,
-                                                       Source={StaticResource resources_label}}"
+                                     IsChecked="{Binding CapturingType, Converter={StaticResource PictureOrMovieToBoolConverter}, ConverterParameter=Picture}" />
+                        <RadioButton Content="{Binding ScreenShotCapturingMoving, Mode=OneWay, Source={StaticResource resources_label}}"
                                      GroupName="CapturingType"
-                                     IsChecked="{Binding CapturingType,
-                                                         Converter={StaticResource PictureOrMovieToBoolConverter},
-                                                         ConverterParameter=Movie}" />
+                                     IsChecked="{Binding CapturingType, Converter={StaticResource PictureOrMovieToBoolConverter}, ConverterParameter=Movie}" />
+                        <RadioButton Content="{Binding ScreenShotCapturingFilm, Mode=OneWay, Source={StaticResource resources_label}}"
+                                     GroupName="CapturingType"
+                                     IsChecked="{Binding CapturingType, Converter={StaticResource PictureOrMovieToBoolConverter}, ConverterParameter=Film}" />
                     </StackPanel>
                 </GroupBox>
             </DockPanel>

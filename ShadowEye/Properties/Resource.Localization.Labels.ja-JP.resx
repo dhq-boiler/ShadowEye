@@ -327,4 +327,7 @@
   <data name="LabelTarget" xml:space="preserve">
     <value>対象画像：</value>
   </data>
+  <data name="ScreenShotCapturingFilm" xml:space="preserve">
+    <value>フィルム</value>
+  </data>
 </root>

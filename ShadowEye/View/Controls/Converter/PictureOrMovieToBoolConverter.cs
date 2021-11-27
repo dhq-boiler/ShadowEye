@@ -23,6 +23,8 @@ namespace ShadowEye.View.Controls.Converter
                     return val == ScreenShotDialogViewModel.PictureOrMovie.Picture;
                 case "Movie":
                     return val == ScreenShotDialogViewModel.PictureOrMovie.Movie;
+                case "Film":
+                    return val == ScreenShotDialogViewModel.PictureOrMovie.Film;
                 default:
                     Debug.Assert(false, string.Format("value is {{{0}}}, parameter is {{{1}}}", value, parameter));
                     break;
@@ -39,6 +41,8 @@ namespace ShadowEye.View.Controls.Converter
                     return ScreenShotDialogViewModel.PictureOrMovie.Picture;
                 case "Movie":
                     return ScreenShotDialogViewModel.PictureOrMovie.Movie;
+                case "Film":
+                    return ScreenShotDialogViewModel.PictureOrMovie.Film;
                 default:
                     Debug.Assert(false, string.Format("value is {{{0}}}, parameter is {{{1}}}", value, parameter));
                     break;

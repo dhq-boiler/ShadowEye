@@ -36,7 +36,7 @@ namespace ShadowEye.Model
         public string Name
         {
             get { return _Name == null ? "" : _Name; }
-            protected set { SetProperty<string>(ref _Name, value, "Name"); }
+            set { SetProperty<string>(ref _Name, value, "Name"); }
         }
 
         public Uri Location
@@ -66,6 +66,10 @@ namespace ShadowEye.Model
                     if (IsRequestedDiscadedMat)
                     {
                         discaded = _mat;
+                    }
+                    else if (this is FilmSource)
+                    {
+                        //do not dispose
                     }
                     else
                     {

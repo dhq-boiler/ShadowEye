@@ -327,4 +327,7 @@
   <data name="LabelTarget" xml:space="preserve">
     <value>Target:</value>
   </data>
+  <data name="ScreenShotCapturingFilm" xml:space="preserve">
+    <value>Film</value>
+  </data>
 </root>
