@@ -1,5 +1,4 @@
-﻿using NLog;
-using OpenCvSharp;
+﻿using OpenCvSharp;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using System;
@@ -22,6 +21,10 @@ namespace ShadowEye.Model
         public ReactivePropertySlim<AnalyzingSource> TargetSource { get; } = new ReactivePropertySlim<AnalyzingSource>();
 
         public ReactiveCommand StopRecordingCommand { get; } = new ReactiveCommand();
+
+        public ReactiveCommand FrameAdvanceCommand { get; } = new ReactiveCommand();
+
+        public ReactiveCommand FrameBackCommand { get; } = new ReactiveCommand();
 
         public FilmSource(string name, AnalyzingSource source) : base(name)
         {
@@ -46,6 +49,24 @@ namespace ShadowEye.Model
             StopRecordingCommand.Subscribe(() =>
             {
                 StopRecording();
+            })
+            .AddTo(disposables);
+
+            FrameAdvanceCommand.Subscribe(() =>
+            {
+                if (Frames.Count() >= CurrentIndex.Value + 1)
+                {
+                    CurrentIndex.Value++;
+                }
+            })
+            .AddTo(disposables);
+
+            FrameBackCommand.Subscribe(() =>
+            {
+                if (CurrentIndex.Value - 1 >= 0)
+                {
+                    CurrentIndex.Value--;
+                }
             })
             .AddTo(disposables);
         }

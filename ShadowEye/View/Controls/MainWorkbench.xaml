@@ -33,12 +33,44 @@
                                        Visibility="{Binding Source, Converter={StaticResource IfTypeIsFilmSource}}">
                                 <Button Width="30"
                                         Height="30"
+                                        Command="{Binding Source.FrameBackCommand}">
+                                    <Button.ContentTemplate>
+                                        <DataTemplate DataType="Button">
+                                            <DockPanel>
+                                                <Rectangle DockPanel.Dock="Left"
+                                                           Width="5"
+                                                           Height="26"
+                                                           Fill="Black" />
+                                                <Path Fill="Black"
+                                                      Data="M 22,26 L 0,13 L 22,0" />
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </Button.ContentTemplate>
+                                </Button>
+                                <Button Width="30"
+                                        Height="30"
                                         Command="{Binding Source.StopRecordingCommand}">
                                     <Button.ContentTemplate>
                                         <DataTemplate DataType="Button">
                                             <Rectangle Width="20"
                                                        Height="20"
                                                        Fill="Black" />
+                                        </DataTemplate>
+                                    </Button.ContentTemplate>
+                                </Button>
+                                <Button Width="30"
+                                        Height="30"
+                                        Command="{Binding Source.FrameAdvanceCommand}">
+                                    <Button.ContentTemplate>
+                                        <DataTemplate DataType="Button">
+                                            <DockPanel>
+                                                <Rectangle DockPanel.Dock="Right"
+                                                           Width="5"
+                                                           Height="26"
+                                                           Fill="Black" />
+                                                <Path Fill="Black"
+                                                      Data="M 0,26 L 22,13 L 0,0" />
+                                            </DockPanel>
                                         </DataTemplate>
                                     </Button.ContentTemplate>
                                 </Button>
@@ -51,7 +83,7 @@
                                 </DockPanel>
                                 <Slider IsSnapToTickEnabled="True"
                                         Maximum="{Binding Source.Frames.Count}"
-                                        Minimum="1"
+                                        Minimum="0"
                                         TickFrequency="1"
                                         Value="{Binding Source.CurrentIndex.Value}" />
                             </DockPanel>
