@@ -4,11 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
+using OpenCvSharp.WpfExtensions;
 using ShadowEye.Model;
 using ShadowEye.Utils;
 using ShadowEye.View.Controls;
@@ -53,10 +55,32 @@ namespace ShadowEye.ViewModel
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.FileName = source.Name;
             dialog.DefaultExt = "jpg";
-            dialog.Filter = GetExtensions();
+            if (source is FilmSource)
+            {
+                dialog.Filter = GetExtensions(true);
+            }
+            else
+            {
+                dialog.Filter = GetExtensions(false);
+            }
             if (dialog.ShowDialog() == true)
             {
-                source.Mat.SaveImage(dialog.FileName);
+                if (Path.GetExtension(dialog.FileName) == ".gif")
+                {
+                    GifBitmapEncoder encoder = new GifBitmapEncoder();
+                    foreach (var mat in (source as FilmSource).Frames.Select(x => x.Item1))
+                    {
+                        encoder.Frames.Add(BitmapFrame.Create(WriteableBitmapConverter.ToWriteableBitmap(mat)));
+                    }
+                    using (var stream = File.Create(dialog.FileName))
+                    {
+                        encoder.Save(stream);
+                    }
+                }
+                else
+                {
+                    source.Mat.SaveImage(dialog.FileName);
+                }
             }
         }
 
@@ -71,24 +95,48 @@ namespace ShadowEye.ViewModel
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.FileName = ivm.Source.Name;
             dialog.DefaultExt = "jpg";
-            dialog.Filter = GetExtensions();
+            if (ivm.Source is FilmSource)
+            {
+                dialog.Filter = GetExtensions(true);
+            }
+            else
+            {
+                dialog.Filter = GetExtensions(false);
+            }
             if (dialog.ShowDialog() == true)
             {
-                ivm.Source.Mat.SaveImage(dialog.FileName);
+                if (Path.GetExtension(dialog.FileName) == ".gif")
+                {
+                    GifBitmapEncoder encoder = new GifBitmapEncoder();
+                    foreach (var mat in (ivm.Source as FilmSource).Frames.Select(x => x.Item1))
+                    {
+                        encoder.Frames.Add(BitmapFrame.Create(WriteableBitmapConverter.ToWriteableBitmap(mat)));
+                    }
+                    using (var stream = File.Create(dialog.FileName))
+                    {
+                        encoder.Save(stream);
+                    }
+                }
+                else
+                {
+                    ivm.Source.Mat.SaveImage(dialog.FileName);
+                }
             }
         }
 
-        private static string GetExtensions()
+        private static string GetExtensions(bool gifSupport)
         {
-            return "Windows Bitmaps|*.bmp;*.dib|" +
-                   "JPEG files|*.jpg;*.jpeg;*.jpe|" +
-                   "JPEG 2000 files|*.jp2|" +
-                   "Portable Network Graphics files|*.png|" +
-                   "WebP|*.webp|" +
-                   "Sun rasters|*.sr;*.ras|" +
-                   "TIFF files|*.tiff;*.tif|" +
-                   "Radiance HDR|*.hdr;*.pic|" +
-                   "All Files|*.*";
+            var ret = "Windows Bitmaps|*.bmp;*.dib|" +
+                      "JPEG files|*.jpg;*.jpeg;*.jpe|" +
+                      "JPEG 2000 files|*.jp2|" +
+                      "Portable Network Graphics files|*.png|" +
+                      "WebP|*.webp|" +
+                      "Sun rasters|*.sr;*.ras|" +
+                      "TIFF files|*.tiff;*.tif|" +
+                      "Radiance HDR|*.hdr;*.pic|";
+            if (gifSupport) ret += "GIF|*.gif|";
+            ret +=    "All Files|*.*";
+            return ret;
         }
 
         public void AddOrActive(AnalyzingSource source)
