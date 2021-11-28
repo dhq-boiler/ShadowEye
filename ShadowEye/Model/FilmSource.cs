@@ -13,6 +13,7 @@ namespace ShadowEye.Model
     public class FilmSource : AnalyzingSource
     {
         private CompositeDisposable disposables = new CompositeDisposable();
+        private bool _disposed;
         private DispatcherTimer _timer;
         private DateTime _previousRecordDateTime;
         public ReactiveCollection<Tuple<Mat, TimeSpan>> Frames { get; } = new ReactiveCollection<Tuple<Mat, TimeSpan>>();
@@ -130,6 +131,27 @@ namespace ShadowEye.Model
             catch (ArgumentException e)
             {
                 Trace.WriteLine(e);
+            }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                base.Dispose(disposing);
+
+                if (disposing)
+                {
+                    Frames.ToList().ForEach(x => x.Item1.Dispose());
+                    Frames.Dispose();
+                    CurrentIndex.Dispose();
+                    TargetSource.Dispose();
+                    StopRecordingCommand.Dispose();
+                    FrameAdvanceCommand.Dispose();
+                    FrameBackCommand.Dispose();
+                }
+
+                _disposed = true;
             }
         }
     }
