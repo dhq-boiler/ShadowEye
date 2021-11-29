@@ -63,10 +63,7 @@ namespace ShadowEye.Model
         {
             try
             {
-                if (Process.HasExited) return string.Format("[{0}]{1} - {2}", Process.Id, "\u30D7\u30ED\u30BB\u30B9\u7D42\u4E86", Process.MainWindowTitle);
-                var mainModule = Process.MainModule;
-                var filename = Path.GetFileName(mainModule.FileName);
-                return string.Format("[{0}]{1} - {2}", Process.Id, filename, Process.MainWindowTitle);
+                return string.Format($"[{Process.Id}]{Process.ProcessName}.exe - {Process.MainWindowTitle}");
             }
             catch (Win32Exception)
             {
