@@ -27,6 +27,12 @@ namespace ShadowEye.Model
 
         public ReactiveCommand FrameBackCommand { get; } = new ReactiveCommand();
 
+        public ReactivePropertySlim<int> SelectionStart { get; } = new ReactivePropertySlim<int>();
+
+        public ReactivePropertySlim<int> SelectionEnd { get; } = new ReactivePropertySlim<int>();
+
+        public ReactivePropertySlim<bool> SelectionEnable { get; } = new ReactivePropertySlim<bool>();
+
         public FilmSource(string name, AnalyzingSource source) : base(name)
         {
             this.HowToUpdate = new ManualUpdater(source);

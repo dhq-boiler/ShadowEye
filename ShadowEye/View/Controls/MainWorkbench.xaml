@@ -37,12 +37,11 @@
                                     <Button.ContentTemplate>
                                         <DataTemplate DataType="Button">
                                             <DockPanel>
-                                                <Rectangle DockPanel.Dock="Left"
-                                                           Width="5"
+                                                <Rectangle Width="5"
                                                            Height="26"
+                                                           DockPanel.Dock="Left"
                                                            Fill="Black" />
-                                                <Path Fill="Black"
-                                                      Data="M 22,26 L 0,13 L 22,0" />
+                                                <Path Data="M 22,26 L 0,13 L 22,0" Fill="Black" />
                                             </DockPanel>
                                         </DataTemplate>
                                     </Button.ContentTemplate>
@@ -64,12 +63,11 @@
                                     <Button.ContentTemplate>
                                         <DataTemplate DataType="Button">
                                             <DockPanel>
-                                                <Rectangle DockPanel.Dock="Right"
-                                                           Width="5"
+                                                <Rectangle Width="5"
                                                            Height="26"
+                                                           DockPanel.Dock="Right"
                                                            Fill="Black" />
-                                                <Path Fill="Black"
-                                                      Data="M 0,26 L 22,13 L 0,0" />
+                                                <Path Data="M 0,26 L 22,13 L 0,0" Fill="Black" />
                                             </DockPanel>
                                         </DataTemplate>
                                     </Button.ContentTemplate>
@@ -81,11 +79,22 @@
                                         <Run Text="{Binding Source.Frames.Count, Mode=OneWay}" />
                                     </TextBlock>
                                 </DockPanel>
-                                <Slider IsSnapToTickEnabled="True"
+                                <Slider IsSelectionRangeEnabled="{Binding Source.SelectionEnable.Value}"
+                                        IsSnapToTickEnabled="True"
                                         Maximum="{Binding Source.Frames.Count}"
                                         Minimum="0"
+                                        SelectionEnd="{Binding Source.SelectionEnd.Value}"
+                                        SelectionStart="{Binding Source.SelectionStart.Value}"
                                         TickFrequency="1"
-                                        Value="{Binding Source.CurrentIndex.Value}" />
+                                        Value="{Binding Source.CurrentIndex.Value}">
+                                    <Slider.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Command="{Binding SelectionStartCommand}" Header="このフレームから始める" />
+                                            <MenuItem Command="{Binding SelectionEndCommand}" Header="このフレームで終わる" />
+                                            <MenuItem Command="{Binding SelectionCancelCommand}" Header="選択をキャンセル" />
+                                        </ContextMenu>
+                                    </Slider.ContextMenu>
+                                </Slider>
                             </DockPanel>
                             <sti:ImageViewport Interpolation="Bilinear"
                                                PixelPointed="ImageViewport_PixelPointed"

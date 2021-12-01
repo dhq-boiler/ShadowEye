@@ -2,6 +2,7 @@
 
 [![Build Status](https://dev.azure.com/dhq-boiler/ShadowEye/_apis/build/status/dhq-boiler.ShadowEye?branchName=master)](https://dev.azure.com/dhq-boiler/ShadowEye/_build/latest?definitionId=5&branchName=master)
 ![GitHub](https://img.shields.io/github/license/dhq-boiler/ShadowEye)
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/dhq-boiler/ShadowEye?include_prereleases)
 
 ShadowEyeはビンテージのコンピュータビジョンツールです。GUIで画像を管理できます。画像のヒストグラムを確認したり、画像にOpenCVの処理を適用させることができます。
 

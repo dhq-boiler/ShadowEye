@@ -1,19 +1,15 @@
 
 
+using Microsoft.Win32;
+using OpenCvSharp.WpfExtensions;
+using ShadowEye.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
-using Microsoft.Win32;
-using OpenCvSharp.WpfExtensions;
-using ShadowEye.Model;
-using ShadowEye.Utils;
-using ShadowEye.View.Controls;
 
 namespace ShadowEye.ViewModel
 {
@@ -68,7 +64,9 @@ namespace ShadowEye.ViewModel
                 if (Path.GetExtension(dialog.FileName) == ".gif")
                 {
                     GifBitmapEncoder encoder = new GifBitmapEncoder();
-                    foreach (var mat in (source as FilmSource).Frames.Select(x => x.Item1))
+                    var filmSource = source as FilmSource;
+                    var list = filmSource.Frames.Skip(filmSource.SelectionStart.Value + 1);
+                    foreach (var mat in list.Take(filmSource.SelectionEnd.Value - filmSource.SelectionStart.Value).Select(x => x.Item1))
                     {
                         encoder.Frames.Add(BitmapFrame.Create(WriteableBitmapConverter.ToWriteableBitmap(mat)));
                     }
@@ -108,7 +106,9 @@ namespace ShadowEye.ViewModel
                 if (Path.GetExtension(dialog.FileName) == ".gif")
                 {
                     GifBitmapEncoder encoder = new GifBitmapEncoder();
-                    foreach (var mat in (ivm.Source as FilmSource).Frames.Select(x => x.Item1))
+                    var filmSource = ivm.Source as FilmSource;
+                    var list = filmSource.Frames.Skip(filmSource.SelectionStart.Value + 1);
+                    foreach (var mat in list.Take(filmSource.SelectionEnd.Value - filmSource.SelectionStart.Value).Select(x => x.Item1))
                     {
                         encoder.Frames.Add(BitmapFrame.Create(WriteableBitmapConverter.ToWriteableBitmap(mat)));
                     }
