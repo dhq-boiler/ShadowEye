@@ -37,12 +37,11 @@
                                     <Button.ContentTemplate>
                                         <DataTemplate DataType="Button">
                                             <DockPanel>
-                                                <Rectangle DockPanel.Dock="Left"
-                                                           Width="5"
+                                                <Rectangle Width="5"
                                                            Height="26"
+                                                           DockPanel.Dock="Left"
                                                            Fill="Black" />
-                                                <Path Fill="Black"
-                                                      Data="M 22,26 L 0,13 L 22,0" />
+                                                <Path Data="M 22,26 L 0,13 L 22,0" Fill="Black" />
                                             </DockPanel>
                                         </DataTemplate>
                                     </Button.ContentTemplate>
@@ -64,12 +63,11 @@
                                     <Button.ContentTemplate>
                                         <DataTemplate DataType="Button">
                                             <DockPanel>
-                                                <Rectangle DockPanel.Dock="Right"
-                                                           Width="5"
+                                                <Rectangle Width="5"
                                                            Height="26"
+                                                           DockPanel.Dock="Right"
                                                            Fill="Black" />
-                                                <Path Fill="Black"
-                                                      Data="M 0,26 L 22,13 L 0,0" />
+                                                <Path Data="M 0,26 L 22,13 L 0,0" Fill="Black" />
                                             </DockPanel>
                                         </DataTemplate>
                                     </Button.ContentTemplate>
