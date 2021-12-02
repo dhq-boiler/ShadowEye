@@ -131,7 +131,7 @@ namespace ShadowEye.ViewModel
                 }
                 else if (Path.GetExtension(dialog.FileName) == ".mp4")
                 {
-                    var source = (ivm.Source as FilmSource);
+                    var source = ivm.Source as FilmSource;
                     using (VideoWriter videoWriter = new VideoWriter(dialog.FileName, FourCC.H264, source.Frames.Count() / (source.Frames.Sum(x => x.Item2.Milliseconds) / 1000d), new Size(ivm.Source.Mat.Width, ivm.Source.Mat.Height)))
                     {
                         foreach (var mat in (ivm.Source as FilmSource).Frames.Select(x => x.Item1))
