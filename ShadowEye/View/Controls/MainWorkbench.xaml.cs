@@ -2,6 +2,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -84,6 +85,8 @@ namespace ShadowEye.View.Controls
                                 }
                             }
                             source.ChannelType = libimgeng.ChannelType.BGR24;
+                            source.CurrentIndex.Value = 1;
+                            source.CurrentIndex.Value = 0;
                         }
                         vm.AddOrActive(source);
                     }
@@ -106,6 +109,8 @@ namespace ShadowEye.View.Controls
                                 }
                             }
                             source.ChannelType = libimgeng.ChannelType.BGR24;
+                            source.CurrentIndex.Value = 1;
+                            source.CurrentIndex.Value = 0;
                         }
                         vm.AddOrActive(source);
                     }
