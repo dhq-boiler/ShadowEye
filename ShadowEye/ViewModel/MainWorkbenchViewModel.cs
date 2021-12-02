@@ -1,6 +1,7 @@
 
 
 using Microsoft.Win32;
+using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
 using ShadowEye.Model;
 using System;
@@ -53,11 +54,11 @@ namespace ShadowEye.ViewModel
             dialog.DefaultExt = "jpg";
             if (source is FilmSource)
             {
-                dialog.Filter = GetExtensions(true);
+                dialog.Filter = GetExtensions(true, true);
             }
             else
             {
-                dialog.Filter = GetExtensions(false);
+                dialog.Filter = GetExtensions(false, false);
             }
             if (dialog.ShowDialog() == true)
             {
@@ -73,6 +74,17 @@ namespace ShadowEye.ViewModel
                     using (var stream = File.Create(dialog.FileName))
                     {
                         encoder.Save(stream);
+                    }
+                }
+                else if (Path.GetExtension(dialog.FileName) == ".mp4")
+                {
+                    var filmSource = source as FilmSource;
+                    using (VideoWriter videoWriter = new VideoWriter(dialog.FileName, FourCC.H264, filmSource.Frames.Count() / (filmSource.Frames.Sum(x => x.Item2.Milliseconds) / 1000d), new Size(source.Mat.Width, source.Mat.Height)))
+                    {
+                        foreach (var mat in (source as FilmSource).Frames.Select(x => x.Item1))
+                        {
+                            videoWriter.Write(mat);
+                        }
                     }
                 }
                 else
@@ -95,11 +107,11 @@ namespace ShadowEye.ViewModel
             dialog.DefaultExt = "jpg";
             if (ivm.Source is FilmSource)
             {
-                dialog.Filter = GetExtensions(true);
+                dialog.Filter = GetExtensions(true, true);
             }
             else
             {
-                dialog.Filter = GetExtensions(false);
+                dialog.Filter = GetExtensions(false, false);
             }
             if (dialog.ShowDialog() == true)
             {
@@ -117,6 +129,17 @@ namespace ShadowEye.ViewModel
                         encoder.Save(stream);
                     }
                 }
+                else if (Path.GetExtension(dialog.FileName) == ".mp4")
+                {
+                    var source = (ivm.Source as FilmSource);
+                    using (VideoWriter videoWriter = new VideoWriter(dialog.FileName, FourCC.H264, source.Frames.Count() / (source.Frames.Sum(x => x.Item2.Milliseconds) / 1000d), new Size(ivm.Source.Mat.Width, ivm.Source.Mat.Height)))
+                    {
+                        foreach (var mat in (ivm.Source as FilmSource).Frames.Select(x => x.Item1))
+                        {
+                            videoWriter.Write(mat);
+                        }
+                    }
+                }
                 else
                 {
                     ivm.Source.Mat.SaveImage(dialog.FileName);
@@ -124,7 +147,7 @@ namespace ShadowEye.ViewModel
             }
         }
 
-        private static string GetExtensions(bool gifSupport)
+        private static string GetExtensions(bool gifSupport, bool mp4Support)
         {
             var ret = "Windows Bitmaps|*.bmp;*.dib|" +
                       "JPEG files|*.jpg;*.jpeg;*.jpe|" +
@@ -135,6 +158,7 @@ namespace ShadowEye.ViewModel
                       "TIFF files|*.tiff;*.tif|" +
                       "Radiance HDR|*.hdr;*.pic|";
             if (gifSupport) ret += "GIF|*.gif|";
+            if (mp4Support) ret += "MP4|*.mp4|";
             ret +=    "All Files|*.*";
             return ret;
         }
