@@ -1,9 +1,11 @@
 
 
 using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using OpenCvSharp;
 using ShadowEye.Model;
 using ShadowEye.ViewModel;
 
@@ -63,7 +65,54 @@ namespace ShadowEye.View.Controls
             {
                 try
                 {
-                    vm.AddOrActive(new FileSource(path));
+                    if (Path.GetExtension(path) == ".gif")
+                    {
+                        var source = new FilmSource(path);
+                        using (VideoCapture capture = new VideoCapture(path))
+                        {
+                            while (capture.IsOpened())
+                            {
+                                Mat mat = new Mat();
+
+                                if (capture.Read(mat))
+                                {
+                                    source.Frames.Add(new Tuple<Mat, TimeSpan>(mat, TimeSpan.FromSeconds(1d / capture.Fps)));
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            source.ChannelType = libimgeng.ChannelType.BGR24;
+                        }
+                        vm.AddOrActive(source);
+                    }
+                    else if (Path.GetExtension(path) == ".mp4")
+                    {
+                        var source = new FilmSource(path);
+                        using (VideoCapture capture = new VideoCapture(path))
+                        {
+                            while (capture.IsOpened())
+                            {
+                                Mat mat = new Mat();
+
+                                if (capture.Read(mat))
+                                {
+                                    source.Frames.Add(new Tuple<Mat, TimeSpan>(mat, TimeSpan.FromSeconds(1d / capture.Fps)));
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            source.ChannelType = libimgeng.ChannelType.BGR24;
+                        }
+                        vm.AddOrActive(source);
+                    }
+                    else
+                    {
+                        vm.AddOrActive(new FileSource(path));
+                    }
                 }
                 catch (ArgumentException)
                 {

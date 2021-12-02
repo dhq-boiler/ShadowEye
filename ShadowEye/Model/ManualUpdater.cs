@@ -9,6 +9,10 @@ namespace ShadowEye.Model
     internal class ManualUpdater : Updater
     {
 
+        public ManualUpdater() : base(null)
+        {
+        }
+
         public ManualUpdater(AnalyzingSource target) : base(target)
         {
         }
@@ -23,7 +27,7 @@ namespace ShadowEye.Model
         {
             if (InUseCount++ == 0)
             {
-                TargetSource.Activate();
+                TargetSource?.Activate();
             }
             Trace.WriteLine(InUseCount, "DynamicUpdater.InUseCount");
         }
@@ -32,7 +36,7 @@ namespace ShadowEye.Model
         {
             if (--InUseCount == 0)
             {
-                TargetSource.Deactivate();
+                TargetSource?.Deactivate();
             }
             Trace.WriteLine(InUseCount, "DynamicUpdater.InUseCount");
         }

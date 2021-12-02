@@ -33,6 +33,49 @@ namespace ShadowEye.Model
 
         public ReactivePropertySlim<bool> SelectionEnable { get; } = new ReactivePropertySlim<bool>();
 
+        public FilmSource(string name) : base(name)
+        {
+            this.HowToUpdate = new ManualUpdater();
+            _timer = new DispatcherTimer();
+            _timer.Interval = TimeSpan.FromTicks(1);
+            _timer.Tick += timer_Tick;
+
+            CurrentIndex.Subscribe(_ =>
+            {
+                if (Frames.Count() - 1 >= CurrentIndex.Value)
+                {
+                    Mat = Frames[CurrentIndex.Value].Item1;
+                    SetBitmapFromMat(Mat);
+                    OnSourceUpdated(this, new EventArgs());
+                }
+            })
+            .AddTo(disposables);
+
+            StopRecordingCommand.Subscribe(() =>
+            {
+                StopRecording();
+            })
+            .AddTo(disposables);
+
+            FrameAdvanceCommand.Subscribe(() =>
+            {
+                if (Frames.Count() >= CurrentIndex.Value + 1)
+                {
+                    CurrentIndex.Value++;
+                }
+            })
+            .AddTo(disposables);
+
+            FrameBackCommand.Subscribe(() =>
+            {
+                if (CurrentIndex.Value - 1 >= 0)
+                {
+                    CurrentIndex.Value--;
+                }
+            })
+            .AddTo(disposables);
+        }
+
         public FilmSource(string name, AnalyzingSource source) : base(name)
         {
             this.HowToUpdate = new ManualUpdater(source);

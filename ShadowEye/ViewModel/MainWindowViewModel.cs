@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -9,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Win32;
+using OpenCvSharp;
 using ShadowEye.Model;
 using ShadowEye.Utils;
 using ShadowEye.View.Dialogs;
@@ -185,7 +187,54 @@ namespace ShadowEye.ViewModel
             {
                 foreach (var filename in dialog.FileNames)
                 {
-                    ImageContainerVM.AddOrActive(new FileSource(filename));
+                    if (Path.GetExtension(filename) == ".gif")
+                    {
+                        var source = new FilmSource(filename);
+                        using (VideoCapture capture = new VideoCapture(filename))
+                        {
+                            while (capture.IsOpened())
+                            {
+                                Mat mat = new Mat();
+
+                                if (capture.Read(mat))
+                                {
+                                    source.Frames.Add(new Tuple<Mat, TimeSpan>(mat, TimeSpan.FromSeconds(1d / capture.Fps)));
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            source.ChannelType = libimgeng.ChannelType.BGR24;
+                        }
+                        ImageContainerVM.AddOrActive(source);
+                    }
+                    else if (Path.GetExtension(filename) == ".mp4")
+                    {
+                        var source = new FilmSource(filename);
+                        using (VideoCapture capture = new VideoCapture(filename))
+                        {
+                            while (capture.IsOpened())
+                            {
+                                Mat mat = new Mat();
+
+                                if (capture.Read(mat))
+                                {
+                                    source.Frames.Add(new Tuple<Mat, TimeSpan>(mat, TimeSpan.FromSeconds(1d / capture.Fps)));
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            source.ChannelType = libimgeng.ChannelType.BGR24;
+                        }
+                        ImageContainerVM.AddOrActive(source);
+                    }
+                    else
+                    {
+                        ImageContainerVM.AddOrActive(new FileSource(filename));
+                    }
                 }
             }
         }
