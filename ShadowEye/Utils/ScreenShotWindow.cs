@@ -5,6 +5,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Windows.Forms;
 using static ShadowEye.Utils.NativeMethods;
 
 namespace ShadowEye.Utils
@@ -122,19 +123,33 @@ namespace ShadowEye.Utils
                 {
                     winDC = GetDC(hWnd);
                     RECT rect = new RECT();
-                    GetClientRect(hWnd, ref rect);
-                    //Bitmapの作成
-                    Bitmap bmp = new Bitmap(rect.right - rect.left,
-                        rect.bottom - rect.top);
-                    //Graphicsの作成
-                    g = Graphics.FromImage(bmp);
-                    //Graphicsのデバイスコンテキストを取得
-                    hDC = g.GetHdc();
-                    //Bitmapに画像をコピーする
-                    BitBlt(hDC, 0, 0, bmp.Width, bmp.Height,
-                        winDC, 0, 0, SRCCOPY);
+                    var result = GetClientRect(hWnd, ref rect);
+                    if (result == 1)
+                    {
+                        //ウィンドウが最大化している
+                        var rectangle = Screen.PrimaryScreen.Bounds;
+                        Bitmap bmp = new Bitmap(rectangle.Width, rectangle.Height);
+                        g = Graphics.FromImage(bmp);
+                        hDC = g.GetHdc();
+                        PrintWindow(hWnd, hDC, 0);
+                        BitBlt(hDC, 0, 0, bmp.Width, bmp.Height, winDC, 0, 0, SRCCOPY);
+                        return bmp;
+                    }
+                    else
+                    {
+                        //Bitmapの作成
+                        Bitmap bmp = new Bitmap(rect.right - rect.left,
+                            rect.bottom - rect.top);
+                        //Graphicsの作成
+                        g = Graphics.FromImage(bmp);
+                        //Graphicsのデバイスコンテキストを取得
+                        hDC = g.GetHdc();
+                        //Bitmapに画像をコピーする
+                        BitBlt(hDC, 0, 0, bmp.Width, bmp.Height,
+                            winDC, 0, 0, SRCCOPY);
 
-                    return bmp;
+                        return bmp;
+                    }
                 }
                 finally
                 {
