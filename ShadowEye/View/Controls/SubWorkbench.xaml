@@ -4,7 +4,7 @@
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 			 xmlns:vvm="clr-namespace:ShadowEye.ViewModel"
 			 xmlns:vvc="clr-namespace:ShadowEye.View.Controls"
-			 xmlns:ia="clr-namespace:imganal;assembly=imganal"
+			 xmlns:ia="clr-namespace:imganalCore;assembly=imganalCore"
 			 xmlns:Converter="clr-namespace:ShadowEye.View.Controls.Converter"
 			 x:Class="ShadowEye.View.Controls.SubWorkbench"
 			 mc:Ignorable="d" 
