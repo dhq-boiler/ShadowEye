@@ -102,7 +102,14 @@ namespace ShadowEye.Model
 
         protected void SetBitmapFromMat(Mat mat)
         {
-            Bitmap = WriteableBitmapConverter.ToWriteableBitmap(mat);
+            try
+            {
+                WriteableBitmapConverter.ToWriteableBitmap(mat, Bitmap);
+            }
+            catch (ArgumentException)
+            {
+                Bitmap = WriteableBitmapConverter.ToWriteableBitmap(mat);
+            }
         }
 
         public WriteableBitmap Bitmap
