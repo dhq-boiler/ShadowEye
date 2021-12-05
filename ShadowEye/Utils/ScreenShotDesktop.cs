@@ -56,7 +56,7 @@ namespace ShadowEye.Utils
                     hdcCompatible = NativeMethods.CreateCompatibleDC(hdcScreen);
 
                     NativeMethods.RECT rect = new NativeMethods.RECT();
-                    NativeMethods.GetWindowRect(hWnd, ref rect);
+                    NativeMethods.GetWindowRect(hWnd, out rect);
                     screenX = rect.right - rect.left;
                     screenY = rect.bottom - rect.top;
 

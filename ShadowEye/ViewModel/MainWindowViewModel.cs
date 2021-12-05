@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -11,17 +12,24 @@ using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Win32;
 using OpenCvSharp;
+using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 using ShadowEye.Model;
 using ShadowEye.Utils;
+using ShadowEye.View;
 using ShadowEye.View.Dialogs;
 
 namespace ShadowEye.ViewModel
 {
-    public class MainWindowViewModel : CommandSink
+    public class MainWindowViewModel : CommandSink, IDisposable
     {
+        private CompositeDisposable disposables = new CompositeDisposable();
         private MainWorkbenchViewModel _imageContainerVM;
         private SubWorkbenchViewModel _subWorkbenchVM;
         private MainWindow _mainWindow;
+        private bool disposedValue;
+
+        public ReactiveCommand PasteCommand { get; } = new ReactiveCommand();
 
         public MainWindowViewModel(MainWindow mainwindow)
         {
@@ -96,6 +104,13 @@ namespace ShadowEye.ViewModel
             {
                 this.EdgeExtractionDialogOpen();
             });
+            PasteCommand.Subscribe(() =>
+            {
+                var bitmap = Clipboard.GetImage();
+                var source = new ClipboardSource(bitmap);
+                ImageContainerVM.AddOrActive(source);
+            })
+            .AddTo(disposables);
         }
 
         private void EdgeExtractionDialogOpen()
@@ -205,7 +220,7 @@ namespace ShadowEye.ViewModel
                                     break;
                                 }
                             }
-                            source.ChannelType = libimgeng.ChannelType.BGR24;
+                            source.ChannelType = libimgengCore.ChannelType.BGR24;
                         }
                         ImageContainerVM.AddOrActive(source);
                     }
@@ -227,7 +242,7 @@ namespace ShadowEye.ViewModel
                                     break;
                                 }
                             }
-                            source.ChannelType = libimgeng.ChannelType.BGR24;
+                            source.ChannelType = libimgengCore.ChannelType.BGR24;
                         }
                         ImageContainerVM.AddOrActive(source);
                     }
@@ -255,6 +270,27 @@ namespace ShadowEye.ViewModel
         {
             get { return _mainWindow; }
             set { SetProperty<MainWindow>(ref _mainWindow, value, "MainWindow"); }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    disposables.Dispose();
+                }
+
+                disposables = null;
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // このコードを変更しないでください。クリーンアップ コードを 'Dispose(bool disposing)' メソッドに記述します
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

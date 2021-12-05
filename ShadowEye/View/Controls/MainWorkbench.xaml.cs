@@ -84,7 +84,7 @@ namespace ShadowEye.View.Controls
                                     break;
                                 }
                             }
-                            source.ChannelType = libimgeng.ChannelType.BGR24;
+                            source.ChannelType = libimgengCore.ChannelType.BGR24;
                             source.CurrentIndex.Value = 1;
                             source.CurrentIndex.Value = 0;
                         }
@@ -108,7 +108,7 @@ namespace ShadowEye.View.Controls
                                     break;
                                 }
                             }
-                            source.ChannelType = libimgeng.ChannelType.BGR24;
+                            source.ChannelType = libimgengCore.ChannelType.BGR24;
                             source.CurrentIndex.Value = 1;
                             source.CurrentIndex.Value = 0;
                         }
@@ -126,7 +126,7 @@ namespace ShadowEye.View.Controls
             }
         }
 
-        private void ImageViewport_PixelPointed(object sender, libSevenTools.WPFControls.Imaging.ImageViewport.PixelPointedEventArgs e)
+        private void ImageViewport_PixelPointed(object sender, libSevenToolsCore.WPFControls.Imaging.ImageViewport.PixelPointedEventArgs e)
         {
             var levelIndicatorVM = (DataContext as MainWorkbenchViewModel).MainWindowVM.SubWorkbenchVM.LevelIndicatorVM;
             levelIndicatorVM.Value1st = e.R;

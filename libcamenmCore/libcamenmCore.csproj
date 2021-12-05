@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="DirectShowLib-2005.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="DirectShowLib-2005.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DirectShowLib-2005">
+      <HintPath>DirectShowLib-2005.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

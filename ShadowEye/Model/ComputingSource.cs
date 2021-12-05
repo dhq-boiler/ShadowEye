@@ -69,16 +69,16 @@ namespace ShadowEye.Model
             }
         }
 
-        protected libimgeng.ChannelType ConvertToChannelType(EColorMode OutColorType)
+        protected libimgengCore.ChannelType ConvertToChannelType(EColorMode OutColorType)
         {
             switch (OutColorType)
             {
                 case EColorMode.BGR:
-                    return libimgeng.ChannelType.BGR24;
+                    return libimgengCore.ChannelType.BGR24;
                 case EColorMode.Grayscale:
-                    return libimgeng.ChannelType.Gray;
+                    return libimgengCore.ChannelType.Gray;
                 case EColorMode.RGB:
-                    return libimgeng.ChannelType.RGB;
+                    return libimgengCore.ChannelType.RGB;
                 default:
                     throw new NotSupportedException(OutColorType.ToString());
             }
@@ -104,15 +104,15 @@ namespace ShadowEye.Model
                                 this.ChannelType = LeftHand.ChannelType;
                                 break;
                             case EColorMode.BGR:
-                                this.ChannelType = libimgeng.ChannelType.BGR24;
+                                this.ChannelType = libimgengCore.ChannelType.BGR24;
                                 break;
                             case EColorMode.RGB:
                                 Cv2.CvtColor(Mat, Mat, ColorConversionCodes.BGR2RGB);
-                                this.ChannelType = libimgeng.ChannelType.RGB;
+                                this.ChannelType = libimgengCore.ChannelType.RGB;
                                 break;
                             case EColorMode.Grayscale:
                                 Cv2.CvtColor(Mat, Mat, ColorConversionCodes.BGR2GRAY);
-                                this.ChannelType = libimgeng.ChannelType.Gray;
+                                this.ChannelType = libimgengCore.ChannelType.Gray;
                                 break;
                             default:
                                 throw new InvalidOperationException("Unknown computing OutputColorType.");
@@ -120,7 +120,7 @@ namespace ShadowEye.Model
                     }
                     else
                     {
-                        this.ChannelType = libimgeng.ChannelType.Gray;
+                        this.ChannelType = libimgengCore.ChannelType.Gray;
                     }
                 }
                 finally

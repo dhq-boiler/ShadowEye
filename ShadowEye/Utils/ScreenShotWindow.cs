@@ -5,6 +5,12 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Windows.Forms;
+using Windows.Graphics.Capture;
+using WinRT;
+using WinRT.Interop;
 using static ShadowEye.Utils.NativeMethods;
 
 namespace ShadowEye.Utils
@@ -69,7 +75,7 @@ namespace ShadowEye.Utils
                 {
                     winDC = GetWindowDC(hWnd);
                     RECT winRect = new RECT();
-                    GetWindowRect(hWnd, ref winRect);
+                    GetWindowRect(hWnd, out winRect);
 
                     //Bitmapの作成
                     Bitmap bmp = new Bitmap(winRect.right - winRect.left,
@@ -121,20 +127,36 @@ namespace ShadowEye.Utils
                 try
                 {
                     winDC = GetDC(hWnd);
-                    RECT rect = new RECT();
-                    GetClientRect(hWnd, ref rect);
-                    //Bitmapの作成
-                    Bitmap bmp = new Bitmap(rect.right - rect.left,
-                        rect.bottom - rect.top);
-                    //Graphicsの作成
-                    g = Graphics.FromImage(bmp);
-                    //Graphicsのデバイスコンテキストを取得
-                    hDC = g.GetHdc();
-                    //Bitmapに画像をコピーする
-                    BitBlt(hDC, 0, 0, bmp.Width, bmp.Height,
-                        winDC, 0, 0, SRCCOPY);
+                    ShowIfError();
+                    if (!IsOnScreen(hWnd))
+                    {
+                        WINDOWPLACEMENT windowPlacement = new WINDOWPLACEMENT();
+                        GetWindowPlacement(hWnd, ref windowPlacement);
+                        var rect = windowPlacement.NormalPosition;
+                        var bmp = new Bitmap(rect.right - rect.left, rect.bottom - rect.top);
+                        g = Graphics.FromImage(bmp);
+                        hDC = g.GetHdc();
+                        PrintWindow(hWnd, hDC, PW_CLIENTONLY);
+                        ShowIfError();
+                        return bmp;
+                    }
+                    else
+                    {
+                        RECT rect;
+                        GetClientRect(hWnd, out rect);
+                        //Bitmapの作成
+                        Bitmap bmp = new Bitmap(rect.right - rect.left,
+                            rect.bottom - rect.top);
+                        //Graphicsの作成
+                        g = Graphics.FromImage(bmp);
+                        //Graphicsのデバイスコンテキストを取得
+                        hDC = g.GetHdc();
+                        //Bitmapに画像をコピーする
+                        BitBlt(hDC, 0, 0, bmp.Width, bmp.Height,
+                            winDC, 0, 0, SRCCOPY);
 
-                    return bmp;
+                        return bmp;
+                    }
                 }
                 finally
                 {
@@ -152,6 +174,59 @@ namespace ShadowEye.Utils
                 if (hdcScreen != IntPtr.Zero)
                     NativeMethods.ReleaseDC(hWnd, hdcScreen);
             }
+        }
+
+        private static void ShowIfError()
+        {
+            var errorCode = Marshal.GetLastWin32Error();
+            if (errorCode != 0)
+            {
+                StringBuilder message = new StringBuilder(255);
+                FormatMessage(
+                  FORMAT_MESSAGE_FROM_SYSTEM,
+                  IntPtr.Zero,
+                  (uint)errorCode,
+                  0,
+                  message,
+                  message.Capacity,
+                  IntPtr.Zero);
+                System.Windows.MessageBox.Show(message.ToString());
+            }
+        }
+
+        private static bool IsFullscreen(IntPtr windowHandle)
+        {
+            MonitorInfoEx monitorInfo = new MonitorInfoEx();
+            GetMonitorInfo(MonitorFromWindow(windowHandle, (uint)MonitorOptions.MONITOR_DEFAULTTONEAREST), ref monitorInfo);
+
+            RECT windowRect = new RECT();
+            GetWindowRect(windowHandle, out windowRect);
+            ShowIfError();
+
+            return windowRect.left == monitorInfo.Monitor.Left
+                && windowRect.right == monitorInfo.Monitor.Right
+                && windowRect.top == monitorInfo.Monitor.Top
+                && windowRect.bottom == monitorInfo.Monitor.Bottom;
+        }
+
+        public static bool IsOnScreen(IntPtr hWnd)
+        {
+            RECT windowRect = new RECT();
+            GetWindowRect(hWnd, out windowRect);
+            ShowIfError();
+            Screen[] screens = Screen.AllScreens;
+            foreach (Screen screen in screens)
+            {
+                Rectangle formRectangle = new Rectangle(windowRect.left, windowRect.top,
+                                                         windowRect.right - windowRect.left, windowRect.bottom - windowRect.top);
+
+                if (screen.WorkingArea.Contains(formRectangle))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         internal override bool IsReady
