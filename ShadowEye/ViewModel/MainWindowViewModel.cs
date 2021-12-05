@@ -220,7 +220,7 @@ namespace ShadowEye.ViewModel
                                     break;
                                 }
                             }
-                            source.ChannelType = libimgeng.ChannelType.BGR24;
+                            source.ChannelType = libimgengCore.ChannelType.BGR24;
                         }
                         ImageContainerVM.AddOrActive(source);
                     }
@@ -242,7 +242,7 @@ namespace ShadowEye.ViewModel
                                     break;
                                 }
                             }
-                            source.ChannelType = libimgeng.ChannelType.BGR24;
+                            source.ChannelType = libimgengCore.ChannelType.BGR24;
                         }
                         ImageContainerVM.AddOrActive(source);
                     }

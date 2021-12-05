@@ -16,20 +16,20 @@ namespace ShadowEye.Model
             UpdateImage();
             ChannelType = GetChannelType(Bitmap.Format);
         }
-        private libimgeng.ChannelType GetChannelType(System.Windows.Media.PixelFormat pixelFormat)
+        private libimgengCore.ChannelType GetChannelType(System.Windows.Media.PixelFormat pixelFormat)
         {
             if (pixelFormat == PixelFormats.Bgr24)
-                return libimgeng.ChannelType.BGR24;
+                return libimgengCore.ChannelType.BGR24;
             else if (pixelFormat == PixelFormats.Bgr32)
-                return libimgeng.ChannelType.BGR32;
+                return libimgengCore.ChannelType.BGR32;
             else if (pixelFormat == PixelFormats.Bgra32)
-                return libimgeng.ChannelType.BGRA;
+                return libimgengCore.ChannelType.BGRA;
             else if (pixelFormat == PixelFormats.Gray8 || (Mat != null && Mat.Type().Channels == 1))
-                return libimgeng.ChannelType.Gray;
+                return libimgengCore.ChannelType.Gray;
             else if (pixelFormat == PixelFormats.Rgb24)
-                return libimgeng.ChannelType.RGB;
+                return libimgengCore.ChannelType.RGB;
             else
-                return libimgeng.ChannelType.Unknown;
+                return libimgengCore.ChannelType.Unknown;
         }
 
         public override bool UpdateOnce => throw new System.NotImplementedException();

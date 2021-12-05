@@ -70,7 +70,7 @@
   <ItemGroup>
     <ProjectReference Include="..\imganal\imganal.csproj" />
     <ProjectReference Include="..\libcamenm\libcamenm.csproj" />
-    <ProjectReference Include="..\libimgeng\libimgeng.csproj" />
+    <ProjectReference Include="..\libimgengCore\libimgengCore.csproj" />
     <ProjectReference Include="..\libSevenToolsCore\libSevenToolsCore.csproj" />
   </ItemGroup>
   <ItemGroup>

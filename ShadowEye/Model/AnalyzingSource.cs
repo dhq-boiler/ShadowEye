@@ -1,6 +1,6 @@
 
 
-using libimgeng;
+using libimgengCore;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using System;

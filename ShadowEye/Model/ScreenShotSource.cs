@@ -24,7 +24,7 @@ namespace ShadowEye.Model
             : base(name)
         {
             HowToUpdate = new StaticUpdater(this);
-            ChannelType = libimgeng.ChannelType.BGR24;
+            ChannelType = libimgengCore.ChannelType.BGR24;
             _timer = new DispatcherTimer();
             _timer.Interval = TimeSpan.FromSeconds(1.0 / 30.0); //30fps
             _timer.Tick += timer_Tick;

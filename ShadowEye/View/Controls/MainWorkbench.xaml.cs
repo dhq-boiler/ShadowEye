@@ -84,7 +84,7 @@ namespace ShadowEye.View.Controls
                                     break;
                                 }
                             }
-                            source.ChannelType = libimgeng.ChannelType.BGR24;
+                            source.ChannelType = libimgengCore.ChannelType.BGR24;
                             source.CurrentIndex.Value = 1;
                             source.CurrentIndex.Value = 0;
                         }
@@ -108,7 +108,7 @@ namespace ShadowEye.View.Controls
                                     break;
                                 }
                             }
-                            source.ChannelType = libimgeng.ChannelType.BGR24;
+                            source.ChannelType = libimgengCore.ChannelType.BGR24;
                             source.CurrentIndex.Value = 1;
                             source.CurrentIndex.Value = 0;
                         }

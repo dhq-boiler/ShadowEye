@@ -1,6 +1,6 @@
 
 
-using libimgeng;
+using libimgengCore;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,7 +31,7 @@ namespace ShadowEye.Model
         {
             this.HowToUpdate = new DynamicUpdater(this);
             this.CameraNumber = cameraNumber;
-            this.ChannelType = libimgeng.ChannelType.BGR24;
+            this.ChannelType = libimgengCore.ChannelType.BGR24;
             using (Graphics g = Graphics.FromHwnd(IntPtr.Zero))
             {
                 _cam = new Camera(cameraNumber, (int)g.DpiX, (int)g.DpiY);

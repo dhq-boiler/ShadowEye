@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
-using libimgeng;
+using libimgengCore;
 using ShadowEye.Model;
 using ShadowEye.Utils;
 
