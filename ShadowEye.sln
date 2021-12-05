@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "imganal", "imganal\imganal.csproj", "{F46F9820-368C-44DB-AC2E-238CF7B63C3B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShadowEye", "ShadowEye\ShadowEye.csproj", "{4E05277B-B985-4A71-98C7-A6A0C98DB90B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B73BA05B-44FA-4960-AFB4-D3DF5A9603A4}"
@@ -36,20 +34,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F46F9820-368C-44DB-AC2E-238CF7B63C3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F46F9820-368C-44DB-AC2E-238CF7B63C3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F46F9820-368C-44DB-AC2E-238CF7B63C3B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{F46F9820-368C-44DB-AC2E-238CF7B63C3B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{F46F9820-368C-44DB-AC2E-238CF7B63C3B}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{F46F9820-368C-44DB-AC2E-238CF7B63C3B}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{F46F9820-368C-44DB-AC2E-238CF7B63C3B}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{F46F9820-368C-44DB-AC2E-238CF7B63C3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F46F9820-368C-44DB-AC2E-238CF7B63C3B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F46F9820-368C-44DB-AC2E-238CF7B63C3B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{F46F9820-368C-44DB-AC2E-238CF7B63C3B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{F46F9820-368C-44DB-AC2E-238CF7B63C3B}.Release|Win32.ActiveCfg = Release|Any CPU
-		{F46F9820-368C-44DB-AC2E-238CF7B63C3B}.Release|x64.ActiveCfg = Release|Any CPU
-		{F46F9820-368C-44DB-AC2E-238CF7B63C3B}.Release|x86.ActiveCfg = Release|Any CPU
 		{4E05277B-B985-4A71-98C7-A6A0C98DB90B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4E05277B-B985-4A71-98C7-A6A0C98DB90B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E05277B-B985-4A71-98C7-A6A0C98DB90B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
