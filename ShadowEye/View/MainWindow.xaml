@@ -24,6 +24,11 @@
         <vvm:CommandSinkBinding Command="vvm:RoutedCommands.ImageProcessing_ExtractChannelCommand" />
         <vvm:CommandSinkBinding Command="vvm:RoutedCommands.Filter_EdgeExtractionCommand" />
     </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Key="V"
+                    Command="{Binding PasteCommand}"
+                    Modifiers="Ctrl" />
+    </Window.InputBindings>
     <Window.Resources>
         <SolidColorBrush x:Key="SplitterBrush" Color="#FFA0A0A0" />
         <vvcc:CameraSourceToFps x:Key="CameraSourceToFpsConverter" />
