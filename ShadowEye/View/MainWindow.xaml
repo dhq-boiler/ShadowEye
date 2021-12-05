@@ -1,4 +1,4 @@
-﻿<Window x:Class="ShadowEye.MainWindow"
+﻿<Window x:Class="ShadowEye.View.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:v="clr-namespace:ShadowEye"

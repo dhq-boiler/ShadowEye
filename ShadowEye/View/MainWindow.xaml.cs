@@ -16,7 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ShadowEye.ViewModel;
 
-namespace ShadowEye
+namespace ShadowEye.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

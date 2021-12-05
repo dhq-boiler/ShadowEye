@@ -13,6 +13,7 @@ using Microsoft.Win32;
 using OpenCvSharp;
 using ShadowEye.Model;
 using ShadowEye.Utils;
+using ShadowEye.View;
 using ShadowEye.View.Dialogs;
 
 namespace ShadowEye.ViewModel
