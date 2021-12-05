@@ -62,7 +62,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
@@ -71,7 +71,7 @@
     <ProjectReference Include="..\imganal\imganal.csproj" />
     <ProjectReference Include="..\libcamenm\libcamenm.csproj" />
     <ProjectReference Include="..\libimgeng\libimgeng.csproj" />
-    <ProjectReference Include="..\libSevenTools\libSevenTools.csproj" />
+    <ProjectReference Include="..\libSevenToolsCore\libSevenToolsCore.csproj" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">

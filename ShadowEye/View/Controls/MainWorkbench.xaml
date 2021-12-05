@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:model="clr-namespace:ShadowEye.Model"
-             xmlns:sti="clr-namespace:libSevenTools.WPFControls.Imaging;assembly=libSevenTools"
+             xmlns:sti="clr-namespace:libSevenToolsCore.WPFControls.Imaging;assembly=libSevenToolsCore"
              xmlns:vvc="clr-namespace:ShadowEye.View.Controls"
              xmlns:vvm="clr-namespace:ShadowEye.ViewModel"
              d:DesignHeight="300"

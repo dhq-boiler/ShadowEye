@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Images\uniform.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\uniform.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resource.ImageViewport.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resource.ImageViewport.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resource.ImageViewport.ja-JP.Designer.cs">
+      <DependentUpon>Resource.ImageViewport.ja-JP.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="WPFControls\DecoratedSlider.xaml.cs">
+      <DependentUpon>DecoratedSlider.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="WPFControls\Imaging\ImageViewport.xaml.cs">
+      <DependentUpon>ImageViewport.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="WPFControls\VerificationTextBox.xaml.cs">
+      <DependentUpon>VerificationTextBox.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resource.ImageViewport.ja-JP.resx">
+      <LastGenOutput>Resource.ImageViewport.ja-JP.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resource.ImageViewport.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.ImageViewport.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="WPFControls\DecoratedSlider.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="WPFControls\Imaging\ImageViewport.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="WPFControls\VerificationTextBox.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+</Project>
