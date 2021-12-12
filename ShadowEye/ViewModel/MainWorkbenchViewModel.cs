@@ -81,7 +81,8 @@ namespace ShadowEye.ViewModel
                     var filmSource = source as FilmSource;
                     using (VideoWriter videoWriter = new VideoWriter(dialog.FileName, FourCC.H264, filmSource.Frames.Count() / (filmSource.Frames.Sum(x => x.Item2.Milliseconds) / 1000d), new Size(source.Mat.Width, source.Mat.Height)))
                     {
-                        foreach (var mat in (source as FilmSource).Frames.Select(x => x.Item1))
+                        var list = filmSource.Frames.Skip(filmSource.SelectionStart.Value + 1);
+                        foreach (var mat in list.Take(filmSource.SelectionEnd.Value - filmSource.SelectionStart.Value).Select(x => x.Item1))
                         {
                             videoWriter.Write(mat);
                         }
@@ -131,10 +132,11 @@ namespace ShadowEye.ViewModel
                 }
                 else if (Path.GetExtension(dialog.FileName) == ".mp4")
                 {
-                    var source = ivm.Source as FilmSource;
-                    using (VideoWriter videoWriter = new VideoWriter(dialog.FileName, FourCC.H264, source.Frames.Count() / (source.Frames.Sum(x => x.Item2.Milliseconds) / 1000d), new Size(ivm.Source.Mat.Width, ivm.Source.Mat.Height)))
+                    var filmSource = ivm.Source as FilmSource;
+                    using (VideoWriter videoWriter = new VideoWriter(dialog.FileName, FourCC.H264, filmSource.Frames.Count() / (filmSource.Frames.Sum(x => x.Item2.Milliseconds) / 1000d), new Size(ivm.Source.Mat.Width, ivm.Source.Mat.Height)))
                     {
-                        foreach (var mat in (ivm.Source as FilmSource).Frames.Select(x => x.Item1))
+                        var list = filmSource.Frames.Skip(filmSource.SelectionStart.Value + 1);
+                        foreach (var mat in list.Take(filmSource.SelectionEnd.Value - filmSource.SelectionStart.Value).Select(x => x.Item1))
                         {
                             videoWriter.Write(mat);
                         }
