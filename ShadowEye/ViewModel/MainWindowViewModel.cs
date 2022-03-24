@@ -183,7 +183,7 @@ namespace ShadowEye.ViewModel
                 SelectCameraDialog dialog = new SelectCameraDialog();
                 if (dialog.ShowDialog() == true)
                 {
-                    CameraSource cam = CameraSource.CreateInstance(dialog.SelectedCameraNumber, dialog.SelectedCameraDeviceName);
+                    CameraSource cam = CameraSource.CreateInstance(dialog.SelectedCameraNumber, dialog.SelectedCameraDeviceName, dialog.SelectedResolution.Width, dialog.SelectedResolution.Height);
                     ImageContainerVM.AddOrActive(cam);
                 }
             }

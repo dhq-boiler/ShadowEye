@@ -14,6 +14,8 @@ namespace libimgengCore
         public int OpenedCameraNumber { get; private set; }
         public int DpiX { get; set; }
         public int DpiY { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
         public double FPS { get { return _vc != null ? _vc.Get(VideoCaptureProperties.Fps) : 0.0; } }
         public bool IsOpen { get { return _vc != null && _vc.IsOpened(); } }
 
@@ -22,12 +24,14 @@ namespace libimgengCore
             Initialize(false);
         }
 
-        public Camera(int cameraNumber) : this()
+        public Camera(int cameraNumber, int width, int height) : this()
         {
+            this.Width = width;
+            this.Height = height;
             Open(cameraNumber);
         }
 
-        public Camera(int cameraNumber, int dpiX, int dpiY) : this(cameraNumber)
+        public Camera(int cameraNumber, int dpiX, int dpiY, int width, int height) : this(cameraNumber, width, height)
         {
             this.DpiX = dpiX;
             this.DpiY = dpiY;
@@ -36,6 +40,8 @@ namespace libimgengCore
         public void Open(int cameraNumber)
         {
             _vc.Open(cameraNumber);
+            _vc.Set(OpenCvSharp.VideoCaptureProperties.FrameWidth, this.Width);
+            _vc.Set(OpenCvSharp.VideoCaptureProperties.FrameHeight, this.Height);
             this.OpenedCameraNumber = cameraNumber;
         }
 
@@ -43,6 +49,8 @@ namespace libimgengCore
         {
             Initialize(saveCameraNumber: true);
             _vc.Open(OpenedCameraNumber);
+            _vc.Set(OpenCvSharp.VideoCaptureProperties.FrameWidth, this.Width);
+            _vc.Set(OpenCvSharp.VideoCaptureProperties.FrameHeight, this.Height);
         }
 
         public void Close(bool saveCameraNumber)

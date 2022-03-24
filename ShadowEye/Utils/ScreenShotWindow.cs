@@ -7,10 +7,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows.Forms;
-using Windows.Graphics.Capture;
-using WinRT;
-using WinRT.Interop;
 using static ShadowEye.Utils.NativeMethods;
 
 namespace ShadowEye.Utils

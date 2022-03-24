@@ -163,7 +163,7 @@ namespace ShadowEye.Model
                 TargetSource.Value.UpdateImage();
                 Mat = TargetSource.Value.Mat.Clone();
                 OnSourceUpdated(this, new EventArgs());
-                Frames.Add(new Tuple<Mat, TimeSpan>(Mat, (_previousRecordDateTime != null ? DateTime.Now - _previousRecordDateTime : TimeSpan.Zero)));
+                Frames.Add(new Tuple<Mat, TimeSpan>(Mat, DateTime.Now - _previousRecordDateTime));
                 _previousRecordDateTime = DateTime.Now;
                 CurrentIndex.Value++;
                 if (HowToUpdate is StaticUpdater
