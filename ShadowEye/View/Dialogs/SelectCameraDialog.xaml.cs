@@ -1,5 +1,6 @@
 
 
+using DirectShowLib;
 using libcamenmCore;
 using System;
 using System.Collections.Generic;
@@ -23,13 +24,20 @@ namespace ShadowEye.View.Dialogs
             try
             {
                 _enumDeviceList = DeviceEnumerator.EnumVideoInputDevice();
+                int cameraNumber = 0;
+                _enumResolutionList = new List<Resolution>();
+                foreach (var device in _enumDeviceList)
+                {
+                    var resolutions = DeviceEnumerator.GetAllAvailableResolution(cameraNumber++, device);
+                    _enumResolutionList.AddRange(resolutions);
+                }
             }
             catch (COMException)
             {
                 throw;
             }
 
-            this.DataContext = _enumDeviceList;
+            this.DataContext = _enumResolutionList;
         }
 
         private void Button_OK_Click(object sender, RoutedEventArgs e)
@@ -39,8 +47,9 @@ namespace ShadowEye.View.Dialogs
                 MessageBox.Show(Properties.Resource_Localization_Messages.NotSelectedCameraNumber);
                 return;
             }
-            _selectedCameraNumber = ListBox_CameraDevices.SelectedIndex;
-            _selectedCameraDeviceName = _enumDeviceList.Cast<string>().ElementAt(_selectedCameraNumber);
+            _selectedCameraNumber = (ListBox_CameraDevices.SelectedItem as Resolution).CameraNumber;
+            _selectedCameraDeviceName = (ListBox_CameraDevices.SelectedItem as Resolution).DsDevice.Name;
+            _selectedResolution = ListBox_CameraDevices.SelectedItem as Resolution;
             DialogResult = true;
         }
 
@@ -54,9 +63,11 @@ namespace ShadowEye.View.Dialogs
             ListBoxItem item = sender as ListBoxItem;
             if (item != null)
             {
-                _selectedCameraNumber = ListBox_CameraDevices.SelectedIndex;
-                _selectedCameraDeviceName = _enumDeviceList.Cast<string>().ElementAt(_selectedCameraNumber);
-                if (!item.Content.Equals(_selectedCameraDeviceName))
+                _selectedCameraNumber = (ListBox_CameraDevices.SelectedItem as Resolution).CameraNumber;
+                _selectedCameraDeviceName = (ListBox_CameraDevices.SelectedItem as Resolution).DsDevice.Name;
+                _selectedResolution = ListBox_CameraDevices.SelectedItem as Resolution;
+                var listBoxItemContent = item.Content as Resolution;
+                if (!listBoxItemContent.DsDevice.Name.Equals(_selectedCameraDeviceName))
                 {
                     throw new Exception(Properties.Resource_Localization_Messages.CameraNumberDoNotCorrespondToDeviceName);
                 }
@@ -64,12 +75,17 @@ namespace ShadowEye.View.Dialogs
             }
         }
 
-        private IEnumerable<string> _enumDeviceList;
+        private IEnumerable<DsDevice> _enumDeviceList;
+
+        private List<Resolution> _enumResolutionList;
 
         private int _selectedCameraNumber;
         public int SelectedCameraNumber { get { return _selectedCameraNumber; } }
 
         private string _selectedCameraDeviceName;
         public string SelectedCameraDeviceName { get { return _selectedCameraDeviceName; } }
+
+        private Resolution _selectedResolution;
+        public Resolution SelectedResolution { get { return _selectedResolution; } }
     }
 }

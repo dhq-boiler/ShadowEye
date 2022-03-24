@@ -18,23 +18,23 @@ namespace ShadowEye.Model
         private DispatcherTimer _timer;
         private static Dictionary<int, CameraSource> s_cams = new Dictionary<int, CameraSource>();
 
-        public static CameraSource CreateInstance(int cameraNumber, string cameraName)
+        public static CameraSource CreateInstance(int cameraNumber, string cameraName, int width, int height)
         {
             if (!s_cams.Keys.Contains(cameraNumber))
             {
-                s_cams.Add(cameraNumber, new CameraSource(cameraNumber, cameraName));
+                s_cams.Add(cameraNumber, new CameraSource(cameraNumber, cameraName, width, height));
             }
             return s_cams[cameraNumber];
         }
 
-        private CameraSource(int cameraNumber, string cameraName) : base(cameraName)
+        private CameraSource(int cameraNumber, string cameraName, int width, int height) : base(cameraName)
         {
             this.HowToUpdate = new DynamicUpdater(this);
             this.CameraNumber = cameraNumber;
             this.ChannelType = libimgengCore.ChannelType.BGR24;
             using (Graphics g = Graphics.FromHwnd(IntPtr.Zero))
             {
-                _cam = new Camera(cameraNumber, (int)g.DpiX, (int)g.DpiY);
+                _cam = new Camera(cameraNumber, (int)g.DpiX, (int)g.DpiY, width, height);
             }
             _timer = new DispatcherTimer();
             _timer.Interval = TimeSpan.FromTicks(1);
