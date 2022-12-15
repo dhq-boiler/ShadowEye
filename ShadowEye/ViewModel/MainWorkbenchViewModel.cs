@@ -1,5 +1,7 @@
 
 
+using CoreTweet;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Win32;
 using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
@@ -44,6 +46,19 @@ namespace ShadowEye.ViewModel
                 ImageViewModel ivm = p as ImageViewModel;
                 AnalyzingSource asrc = ivm.Source as AnalyzingSource;
                 this.MainWindowVM.ImageContainerVM.AddOrActive(new DiscadedSource(asrc));
+            });
+            base.RegisterCommand(RoutedCommands.TweetCommand, (object p) => true, (object p) =>
+            {
+                var cbr = new ConfigurationBuilder().AddUserSecrets("aa277159-b8f6-4f58-9c86-11e34bfa9906").Build();
+                var session = OAuth.Authorize(cbr["APIKey"], cbr["APIKeySecret"]);
+                System.Diagnostics.Process.Start(new ProcessStartInfo
+                {
+                    UseShellExecute = true,
+                    FileName = session.AuthorizeUri.AbsoluteUri,
+                });
+                var tokens = OAuth.GetTokens(session, "PINCODE");
+                var token = CoreTweet.OAuth2Token.Create(cbr["APIKey"], cbr["APIKeySecret"], cbr["BearerToken"]);
+                token.Statuses.Update(status => "TEST");
             });
         }
 

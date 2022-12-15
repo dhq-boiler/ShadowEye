@@ -19,6 +19,7 @@
         <vvm:CommandSinkBinding Command="vvm:RoutedCommands.StoreDiscadedImageCommand" />
         <vvm:CommandSinkBinding Command="vvm:RoutedCommands.SaveAsCommand" />
         <vvm:CommandSinkBinding Command="vvm:RoutedCommands.CloseThisTabCommand" />
+        <vvm:CommandSinkBinding Command="vvm:RoutedCommands.TweetCommand" />
     </UserControl.CommandBindings>
     <UserControl.Resources>
         <converter:TypeOfConverter x:Key="TypeOf" />
@@ -118,6 +119,9 @@
                         <MenuItem Command="vvm:RoutedCommands.CloseThisTabCommand"
                                   CommandParameter="{Binding}"
                                   Header="Close" />
+                        <MenuItem Command="vvm:RoutedCommands.TweetCommand"
+                                  CommandParameter="{Binding}"
+                                  Header="Tweet" />
                     </ContextMenu>
                 </Setter.Value>
             </Setter>

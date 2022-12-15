@@ -19,6 +19,7 @@ namespace ShadowEye.ViewModel
         public static readonly RoutedCommand StoreDiscadedImageCommand = new RoutedCommand();
         public static readonly RoutedCommand SaveAsCommand = new RoutedCommand();
         public static readonly RoutedCommand CloseThisTabCommand = new RoutedCommand();
+        public static readonly RoutedCommand TweetCommand = new RoutedCommand();
 
         #endregion
 

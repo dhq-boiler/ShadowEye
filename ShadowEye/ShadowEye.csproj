@@ -95,11 +95,13 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CoreTweet" Version="1.0.0.483" />
     <PackageReference Include="GitVersion.MsBuild" Version="5.8.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
     <PackageReference Include="NLog" Version="4.7.12" />
     <PackageReference Include="OpenCvSharp4.Windows" Version="4.5.3.20210817" />
     <PackageReference Include="ReactiveProperty.WPF" Version="8.0.2" />
@@ -137,5 +139,6 @@
   </ItemGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <UserSecretsId>aa277159-b8f6-4f58-9c86-11e34bfa9906</UserSecretsId>
   </PropertyGroup>
 </Project>
