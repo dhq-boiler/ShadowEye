@@ -53,3 +53,19 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
+[assembly:
+    AssemblyVersion(ThisAssembly.Git.BaseVersion.Major + "." + ThisAssembly.Git.BaseVersion.Minor + "." +
+                    ThisAssembly.Git.BaseVersion.Patch)]
+
+[assembly:
+    AssemblyFileVersion(ThisAssembly.Git.SemVer.Major + "." + ThisAssembly.Git.SemVer.Minor + "." +
+                        ThisAssembly.Git.SemVer.Patch)]
+
+[assembly: AssemblyInformationalVersion(
+    "v" +
+    ThisAssembly.Git.SemVer.Major + "." +
+    ThisAssembly.Git.SemVer.Minor + "." +
+    ThisAssembly.Git.SemVer.Patch + "." +
+    ThisAssembly.Git.Commits + "-" +
+    ThisAssembly.Git.Branch + "+" +
+    ThisAssembly.Git.Commit)]
