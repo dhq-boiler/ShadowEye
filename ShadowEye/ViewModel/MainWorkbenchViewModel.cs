@@ -23,6 +23,7 @@ namespace ShadowEye.ViewModel
         private Dictionary<string, AnalyzingSource> _tab_collection;
         private ImageViewModel _selectedImageVM;
         private static string _previousSaveDir;
+        private static string _previousSaveExtension;
         public MainWindowViewModel MainWindowVM { get; private set; }
 
         public MainWorkbenchViewModel(MainWindowViewModel mainwindowVM)
@@ -66,7 +67,7 @@ namespace ShadowEye.ViewModel
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.FileName = GetDefaultFileName(source.Name);
             dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            dialog.DefaultExt = "png";
+            dialog.DefaultExt = _previousSaveExtension;
             dialog.AddExtension = true;
             if (source is FilmSource)
             {
@@ -108,6 +109,9 @@ namespace ShadowEye.ViewModel
                 {
                     source.Mat.SaveImage(dialog.FileName);
                 }
+
+                _previousSaveDir = Path.GetDirectoryName(dialog.FileName);
+                _previousSaveExtension = Path.GetExtension(dialog.FileName);
             }
         }
 
@@ -122,7 +126,7 @@ namespace ShadowEye.ViewModel
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.FileName = GetDefaultFileName(ivm.Source.Name);
             dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            dialog.DefaultExt = "jpg";
+            dialog.DefaultExt = _previousSaveExtension;
             if (ivm.Source is FilmSource)
             {
                 dialog.Filter = GetExtensions(true, true);
@@ -165,6 +169,7 @@ namespace ShadowEye.ViewModel
                 }
 
                 _previousSaveDir = Path.GetDirectoryName(dialog.FileName);
+                _previousSaveExtension = Path.GetExtension(dialog.FileName);
             }
         }
 
