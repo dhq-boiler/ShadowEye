@@ -68,7 +68,13 @@ namespace ShadowEye.ViewModel
                     {
                         try
                         {
-                            source.Bitmap.Value.Dispatcher.Invoke(() =>
+                            if (App.Current is null)
+                            {
+                                _task = null;
+                                return;
+                            }
+
+                            App.Current.Dispatcher.Invoke(() =>
                             {
                                 Stopwatch sw = new Stopwatch();
                                 sw.Start();
@@ -105,17 +111,25 @@ namespace ShadowEye.ViewModel
 
         private void SetHistogram(AnalyzingSource source)
         {
-            if (source.Mat != null)
+            var mat = source.Mat.Value;
+            lock (mat)
             {
-                if (Histogram == null)
+                if (mat is not null)
                 {
-                    InitHistogram(source);
+                    if (Histogram == null)
+                    {
+                        InitHistogram(source);
+                    }
+
+                    if (mat.IsDisposed)
+                        return;
+
+                    Histogram.Calculate(mat);
                 }
-                Histogram.Calculate(source.Mat.Value);
-            }
-            else
-            {
-                Trace.WriteLine("Histogram.SetHistogram() failed to receive source.Mat.");
+                else
+                {
+                    Trace.WriteLine("Histogram.SetHistogram() failed to receive source.Mat.");
+                }
             }
         }
 
@@ -128,7 +142,7 @@ namespace ShadowEye.ViewModel
             }
             Histogram = new Histogram();
             Histogram.PropertyChanged += (s, ea) => OnPropertyChanged();
-            if (source.Mat != null)
+            if (source.Mat.Value is not null)
             {
                 Histogram.Initialize(source.Mat.Value, source.ChannelType);
             }

@@ -1,8 +1,11 @@
 
 
 using OpenCvSharp;
+using Reactive.Bindings;
 using System;
 using System.Diagnostics;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 
 namespace ShadowEye.Model
 {
@@ -20,14 +23,23 @@ namespace ShadowEye.Model
 
             LeftHand = left;
             RightHand = right;
+            HandsLocked.Value = true;
             Method = method;
             OutputColorType = colorMode;
             ChannelType = ConvertToChannelType(colorMode);
             Mat.Value = new Mat();
 
+            LeftHand.HowToUpdate.Request();
+            RightHand.HowToUpdate.Request();
+
             LeftHand.MatChanged += LeftHand_MatChanged;
             RightHand.MatChanged += RightHand_MatChanged;
             UpdateImage();
+
+            if (HowToUpdate is DynamicUpdater)
+            {
+                HowToUpdate.Request();
+            }
         }
 
         private Updater HaveAnyDynamicUpdater(AnalyzingSource left, AnalyzingSource right)

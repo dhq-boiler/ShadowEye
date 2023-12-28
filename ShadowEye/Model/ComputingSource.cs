@@ -1,27 +1,45 @@
 
 
 using OpenCvSharp;
+using Reactive.Bindings;
 using System;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using Reactive.Bindings.Extensions;
 
 namespace ShadowEye.Model
 {
     public abstract class ComputingSource : AnalyzingSource, IToggle
     {
+        private CompositeDisposable _disposables = new();
         private AnalyzingSource _LeftHand;
         private AnalyzingSource _RightHand;
         private ComputingMethod _Method;
         private EColorMode _OutputColorType;
+        public ReactivePropertySlim<bool> IsRunning { get; } = new(false);
+
+        public ReactivePropertySlim<bool> HandsLocked { get; } = new(false);
 
         public AnalyzingSource LeftHand
         {
             get { return _LeftHand; }
-            set { _LeftHand = value; }
+            set
+            {
+                if (HandsLocked.Value)
+                    return;
+                _LeftHand = value;
+            }
         }
 
         public AnalyzingSource RightHand
         {
             get { return _RightHand; }
-            set { _RightHand = value; }
+            set
+            {
+                if (HandsLocked.Value)
+                    return;
+                _RightHand = value;
+            }
         }
 
         public ComputingMethod Method
@@ -92,40 +110,75 @@ namespace ShadowEye.Model
             {
                 try
                 {
-                    Compute();
-
-                    if (Mat.Value.Type().Channels == 3)
+                    lock (LeftHand.Mat.Value) lock (RightHand.Mat.Value)
                     {
-                        switch (OutputColorType)
+                        if (LeftHand.Mat.Value is null || LeftHand.Mat.Value.IsDisposed 
+                         || RightHand.Mat.Value is null || RightHand.Mat.Value.IsDisposed)
                         {
-                            case EColorMode.Unknown:
-                                throw new InvalidOperationException("OutputColorType didn't set.");
-                            case EColorMode.Original:
-                                this.ChannelType = LeftHand.ChannelType;
-                                break;
-                            case EColorMode.BGR:
-                                this.ChannelType = libimgengCore.ChannelType.BGR24;
-                                break;
-                            case EColorMode.RGB:
-                                Cv2.CvtColor(Mat.Value, Mat.Value, ColorConversionCodes.BGR2RGB);
-                                this.ChannelType = libimgengCore.ChannelType.RGB;
-                                break;
-                            case EColorMode.Grayscale:
-                                Cv2.CvtColor(Mat.Value, Mat.Value, ColorConversionCodes.BGR2GRAY);
-                                this.ChannelType = libimgengCore.ChannelType.Gray;
-                                break;
-                            default:
-                                throw new InvalidOperationException("Unknown computing OutputColorType.");
+                            return;
                         }
+                        Compute();
                     }
-                    else
+
+                    lock (Mat.Value)
                     {
-                        this.ChannelType = libimgengCore.ChannelType.Gray;
+                        if (Mat.Value.Type().Channels == 4)
+                        {
+                            switch (OutputColorType)
+                            {
+                                case EColorMode.Unknown:
+                                    throw new InvalidOperationException("OutputColorType didn't set.");
+                                case EColorMode.Original:
+                                    this.ChannelType = LeftHand.ChannelType;
+                                    break;
+                                case EColorMode.BGR:
+                                    this.ChannelType = libimgengCore.ChannelType.BGRA;
+                                    break;
+                                case EColorMode.RGB:
+                                    Cv2.CvtColor(Mat.Value, Mat.Value, ColorConversionCodes.BGRA2RGBA);
+                                    this.ChannelType = libimgengCore.ChannelType.RGBA;
+                                    break;
+                                case EColorMode.Grayscale:
+                                    Cv2.CvtColor(Mat.Value, Mat.Value, ColorConversionCodes.BGRA2GRAY);
+                                    this.ChannelType = libimgengCore.ChannelType.Gray;
+                                    break;
+                                default:
+                                    throw new InvalidOperationException("Unknown computing OutputColorType.");
+                            }
+                        }
+                        else if (Mat.Value.Type().Channels == 3)
+                        {
+                            switch (OutputColorType)
+                            {
+                                case EColorMode.Unknown:
+                                    throw new InvalidOperationException("OutputColorType didn't set.");
+                                case EColorMode.Original:
+                                    this.ChannelType = LeftHand.ChannelType;
+                                    break;
+                                case EColorMode.BGR:
+                                    this.ChannelType = libimgengCore.ChannelType.BGR24;
+                                    break;
+                                case EColorMode.RGB:
+                                    Cv2.CvtColor(Mat.Value, Mat.Value, ColorConversionCodes.BGR2RGB);
+                                    this.ChannelType = libimgengCore.ChannelType.RGB;
+                                    break;
+                                case EColorMode.Grayscale:
+                                    Cv2.CvtColor(Mat.Value, Mat.Value, ColorConversionCodes.BGR2GRAY);
+                                    this.ChannelType = libimgengCore.ChannelType.Gray;
+                                    break;
+                                default:
+                                    throw new InvalidOperationException("Unknown computing OutputColorType.");
+                            }
+                        }
+                        else
+                        {
+                            this.ChannelType = libimgengCore.ChannelType.Gray;
+                        }
                     }
                 }
                 finally
                 {
-                    if (Mat.Value != null && (!AnyDynamicSource() || IsShowingCurrentTab()))
+                    if (Mat.Value is not null && (AnyDynamicSource() || IsShowingCurrentTab()))
                     {
                         SetBitmapFromMat(Mat.Value);
                         OnSourceUpdated(this, new EventArgs());
@@ -170,6 +223,8 @@ namespace ShadowEye.Model
 
         public override void Activate()
         {
+            IsRunning.Value = true;
+
             if (LeftHand != null)
             {
                 LeftHand.HowToUpdate.Request();
@@ -179,10 +234,28 @@ namespace ShadowEye.Model
             {
                 RightHand.HowToUpdate.Request();
             }
+
+            //InitialAction.Run(() =>
+            //{
+            //    return Observable.Interval(TimeSpan.FromSeconds(1.0 / 30.0))
+            //        .Subscribe(_ =>
+            //        {
+            //            if (IsRunning.Value) UpdateImage();
+            //        })
+            //        .AddTo(_disposables);
+            //});
+            Observable.Interval(TimeSpan.FromSeconds(1.0 / 30.0))
+                .Subscribe(_ =>
+                {
+                    if (IsRunning.Value) UpdateImage();
+                })
+                .AddTo(_disposables);
         }
 
         public override void Deactivate()
         {
+            IsRunning.Value = false;
+
             if (LeftHand != null)
             {
                 LeftHand.HowToUpdate.RequestAccomplished();
@@ -202,18 +275,15 @@ namespace ShadowEye.Model
                 if (disposing)
                 {
                     //Manage objects release
-                    if (LeftHand is IToggle)
-                    {
-                        (LeftHand as IToggle).Deactivate();
-                    }
+                    LeftHand?.HowToUpdate.RequestAccomplished();
+                    RightHand?.HowToUpdate.RequestAccomplished();
 
-                    if (RightHand is IToggle)
-                    {
-                        (RightHand as IToggle).Deactivate();
-                    }
+                    _disposables.Dispose();
 
                     SafetyStop();
                 }
+
+                LeftHand = RightHand = null;
 
                 _disposed = true;
                 base.Dispose(disposing);

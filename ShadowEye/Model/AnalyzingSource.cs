@@ -22,28 +22,23 @@ namespace ShadowEye.Model
         private bool _disposed;
         private string _Name;
         private bool _IsEnable = true;
-        private HashSet<AnalyzingSource> _RequestDiscadedMat;
+        private List<AnalyzingSource> _RequestDiscadedMat;
 
         private AnalyzingSource()
         {
-            _RequestDiscadedMat = new HashSet<AnalyzingSource>();
+            _RequestDiscadedMat = new List<AnalyzingSource>();
             Mat.Zip(Mat.Skip(1), (Old, New) => new { OldItem = Old, NewItem = New })
                 .Subscribe(pair =>
                 {
-                    Mat discaded = null;
 
-                    if (IsRequestedDiscadedMat)
+                    if (_RequestDiscadedMat.Any() && _RequestDiscadedMat.Last().Equals(this))
                     {
-                        discaded = pair.OldItem;
+                        var discaded = pair.OldItem;
 
                         lock (discaded)
                         {
                             discaded.Dispose();
                         }
-                    }
-                    else if (this is FilmSource)
-                    {
-                        //do not dispose
                     }
 
                     OnMatChanged(this, new MatChangedEventArgs(pair.OldItem));

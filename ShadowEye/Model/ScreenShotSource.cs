@@ -24,12 +24,6 @@ namespace ShadowEye.Model
         {
             HowToUpdate = new StaticUpdater(this);
             ChannelType = libimgengCore.ChannelType.BGR24;
-            Observable.Interval(TimeSpan.FromSeconds(1.0 / 30.0))
-                .Subscribe(_ =>
-                {
-                    if (IsRunning.Value) UpdateImage();
-                })
-                .AddTo(_disposables);
         }
 
         public ScreenShotArea Area
@@ -72,6 +66,12 @@ namespace ShadowEye.Model
         public override void Activate()
         {
             IsRunning.Value = true;
+            Observable.Interval(TimeSpan.FromSeconds(1.0 / 30.0))
+                .Subscribe(_ =>
+                {
+                    if (IsRunning.Value) UpdateImage();
+                })
+                .AddTo(_disposables);
         }
 
         public override void Deactivate()
