@@ -72,47 +72,6 @@ namespace ShadowEye.Model
 
         public ReactivePropertySlim<Mat> Mat { get; } = new();
 
-        //public Mat Mat
-        //{
-        //    get
-        //    {
-        //        if (_mat == null || _mat.IsDisposed)
-        //            return null;
-        //        else
-        //            return _mat;
-        //    }
-        //    set
-        //    {
-        //        Mat discaded = null;
-
-        //        if (_mat != null && !_mat.IsDisposed)
-        //        {
-        //            if (IsRequestedDiscadedMat)
-        //            {
-        //                discaded = _mat;
-        //            }
-        //            else if (this is FilmSource)
-        //            {
-        //                //do not dispose
-        //            }
-        //            else
-        //            {
-        //                lock (_mat)
-        //                {
-        //                    _mat.Dispose();
-        //                }
-
-        //                Trace.WriteLine(string.Format("{0}", Name), "MatDisposed");
-        //            }
-        //        }
-
-        //        SetProperty<Mat>(ref _mat, value, "Mat");
-
-        //        if (value != null)
-        //            OnMatChanged(this, new MatChangedEventArgs(discaded));
-        //    }
-        //}
-
         public Updater HowToUpdate { get; set; }
 
         public void RequestDiscadedMat(AnalyzingSource source)
