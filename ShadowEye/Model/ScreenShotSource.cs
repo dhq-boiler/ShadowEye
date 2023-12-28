@@ -1,6 +1,5 @@
-
-
 using OpenCvSharp.Extensions;
+using OpenCvSharp.WpfExtensions;
 using ShadowEye.Utils;
 using System;
 using System.ComponentModel;

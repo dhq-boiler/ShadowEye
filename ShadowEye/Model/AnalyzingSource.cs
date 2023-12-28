@@ -2,15 +2,14 @@
 
 using libimgengCore;
 using OpenCvSharp;
-using OpenCvSharp.Extensions;
+using OpenCvSharp.WpfExtensions;
+using ShadowEye.Utils;
+using ShadowEye.View;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Media.Imaging;
-using ShadowEye.Utils;
-using OpenCvSharp.WpfExtensions;
-using ShadowEye.View;
 
 namespace ShadowEye.Model
 {
