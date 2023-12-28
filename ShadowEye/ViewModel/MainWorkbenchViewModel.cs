@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Size = OpenCvSharp.Size;
@@ -21,6 +22,7 @@ namespace ShadowEye.ViewModel
         private int _selectedIndex;
         private Dictionary<string, AnalyzingSource> _tab_collection;
         private ImageViewModel _selectedImageVM;
+        private static string _previousSaveDir;
         public MainWindowViewModel MainWindowVM { get; private set; }
 
         public MainWorkbenchViewModel(MainWindowViewModel mainwindowVM)
@@ -62,8 +64,10 @@ namespace ShadowEye.ViewModel
         internal void SaveAsDialogOpen(AnalyzingSource source)
         {
             SaveFileDialog dialog = new SaveFileDialog();
-            dialog.FileName = source.Name;
-            dialog.DefaultExt = "jpg";
+            dialog.FileName = GetDefaultFileName(source.Name);
+            dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            dialog.DefaultExt = "png";
+            dialog.AddExtension = true;
             if (source is FilmSource)
             {
                 dialog.Filter = GetExtensions(true, true);
@@ -116,7 +120,8 @@ namespace ShadowEye.ViewModel
             }
 
             SaveFileDialog dialog = new SaveFileDialog();
-            dialog.FileName = ivm.Source.Name;
+            dialog.FileName = GetDefaultFileName(ivm.Source.Name);
+            dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             dialog.DefaultExt = "jpg";
             if (ivm.Source is FilmSource)
             {
@@ -158,23 +163,40 @@ namespace ShadowEye.ViewModel
                 {
                     ivm.Source.Mat.SaveImage(dialog.FileName);
                 }
+
+                _previousSaveDir = Path.GetDirectoryName(dialog.FileName);
             }
+        }
+
+        private string GetDefaultFileName(string name)
+        {
+            var currentDirectory = Environment.CurrentDirectory;
+            if (string.IsNullOrEmpty(_previousSaveDir))
+            {
+                _previousSaveDir = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            }
+            var regex = new Regex("(?<name>.+?)-(?<index>\\d+?)");
+            var files = Directory.EnumerateFiles(_previousSaveDir);
+            var nextIndex = files.Where(file => regex.IsMatch(file)).Select(file => int.Parse(regex.Match(file).Groups["index"].Value)).Max() + 1;
+            return $"{regex.Match(name).Groups["name"].Value}-{nextIndex}";
         }
 
         private static string GetExtensions(bool gifSupport, bool mp4Support)
         {
-            var ret = "Windows Bitmaps|*.bmp;*.dib|" +
-                      "JPEG files|*.jpg;*.jpeg;*.jpe|" +
-                      "JPEG 2000 files|*.jp2|" +
-                      "Portable Network Graphics files|*.png|" +
-                      "WebP|*.webp|" +
-                      "Sun rasters|*.sr;*.ras|" +
-                      "TIFF files|*.tiff;*.tif|" +
-                      "Radiance HDR|*.hdr;*.pic|";
-            if (gifSupport) ret += "GIF|*.gif|";
-            if (mp4Support) ret += "MP4|*.mp4|";
-            ret +=    "All Files|*.*";
-            return ret;
+            List<string> extentions = [
+                                "Windows Bitmaps|*.bmp;*.dib",
+                                "JPEG files|*.jpg;*.jpeg;*.jpe",
+                                "JPEG 2000 files|*.jp2",
+                                "Portable Network Graphics files|*.png",
+                                "WebP|*.webp",
+                                "Sun rasters|*.sr;*.ras",
+                                "TIFF files|*.tiff;*.tif",
+                                "Radiance HDR|*.hdr;*.pic"
+                ];
+            if (gifSupport) extentions.Add("GIF|*.gif");
+            if (mp4Support) extentions.Add("MP4|*.mp4");
+            extentions.Add("All Files|*.*");
+            return string.Join('|', extentions.Order());
         }
 
         public void AddOrActive(AnalyzingSource source)
