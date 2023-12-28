@@ -66,7 +66,9 @@ namespace ShadowEye.ViewModel
             {
                 _task = new Task(() =>
                     {
-                        source.Bitmap.Value.Dispatcher.Invoke(() =>
+                        try
+                        {
+                            source.Bitmap.Value.Dispatcher.Invoke(() =>
                             {
                                 Stopwatch sw = new Stopwatch();
                                 sw.Start();
@@ -77,7 +79,9 @@ namespace ShadowEye.ViewModel
                                 catch (Exception ex)
                                 {
                                     source.IsEnable = false;
-                                    MessageBox.Show(Properties.Resource_Localization_Messages.NotSupportFormat + "\n\nException:\n" + ex.ToString(),
+                                    MessageBox.Show(
+                                        Properties.Resource_Localization_Messages.NotSupportFormat +
+                                        "\n\nException:\n" + ex.ToString(),
                                         Properties.Resource_Localization_Labels.NotSupportFormatError,
                                         MessageBoxButton.OK);
                                 }
@@ -85,9 +89,15 @@ namespace ShadowEye.ViewModel
                                 {
                                     _task = null;
                                 }
+
                                 sw.Stop();
                                 HistogramFps = 1.0 / (sw.ElapsedMilliseconds / 1000.0);
                             });
+                        }
+                        catch (TaskCanceledException exception)
+                        {
+                            _task = null;
+                        }
                     });
                 _task.Start();
             }
