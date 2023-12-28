@@ -14,7 +14,7 @@ namespace ShadowEye.Model
             this.bitmap = bitmap;
             this.HowToUpdate = new StaticUpdater(this);
             UpdateImage();
-            ChannelType = GetChannelType(Bitmap.Format);
+            ChannelType = GetChannelType(Bitmap.Value.Format);
         }
         private libimgengCore.ChannelType GetChannelType(System.Windows.Media.PixelFormat pixelFormat)
         {
@@ -24,7 +24,7 @@ namespace ShadowEye.Model
                 return libimgengCore.ChannelType.BGR32;
             else if (pixelFormat == PixelFormats.Bgra32)
                 return libimgengCore.ChannelType.BGRA;
-            else if (pixelFormat == PixelFormats.Gray8 || (Mat != null && Mat.Type().Channels == 1))
+            else if (pixelFormat == PixelFormats.Gray8 || (Mat != null && Mat.Value.Type().Channels == 1))
                 return libimgengCore.ChannelType.Gray;
             else if (pixelFormat == PixelFormats.Rgb24)
                 return libimgengCore.ChannelType.RGB;
@@ -44,7 +44,7 @@ namespace ShadowEye.Model
 
         public override void UpdateImage()
         {
-            Bitmap = new WriteableBitmap(bitmap);
+            Bitmap.Value = new WriteableBitmap(bitmap);
             OnSourceUpdated(this, new System.EventArgs());
         }
     }

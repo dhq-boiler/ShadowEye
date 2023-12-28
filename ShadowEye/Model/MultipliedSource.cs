@@ -12,10 +12,10 @@ namespace ShadowEye.Model
         public MultipliedSource(string name, AnalyzingSource left, AnalyzingSource right, double scaleFactor, EColorMode colorMode)
             : base(name)
         {
-            Debug.Assert(left.Mat.Width == right.Mat.Width);
-            Debug.Assert(left.Mat.Height == right.Mat.Height);
-            Debug.Assert(left.Mat.Type().Channels == right.Mat.Type().Channels);
-            Debug.Assert(left.Mat.Type().Depth == right.Mat.Type().Depth);
+            Debug.Assert(left.Mat.Value.Width == right.Mat.Value.Width);
+            Debug.Assert(left.Mat.Value.Height == right.Mat.Value.Height);
+            Debug.Assert(left.Mat.Value.Type().Channels == right.Mat.Value.Type().Channels);
+            Debug.Assert(left.Mat.Value.Type().Depth == right.Mat.Value.Type().Depth);
 
             this.HowToUpdate = HaveAnyDynamicUpdater(left, right);
 
@@ -24,7 +24,7 @@ namespace ShadowEye.Model
             OutputColorType = colorMode;
             ChannelType = ConvertToChannelType(colorMode);
             _ScaleFactor = scaleFactor;
-            Mat = new Mat();
+            Mat.Value = new Mat();
 
             LeftHand.MatChanged += LeftHand_MatChanged;
             RightHand.MatChanged += RightHand_MatChanged;
@@ -43,8 +43,8 @@ namespace ShadowEye.Model
         {
             using (Mat newMat = new Mat())
             {
-                Cv2.Multiply(LeftHand.Mat, RightHand.Mat, newMat, _ScaleFactor);
-                Mat = newMat.Clone();
+                Cv2.Multiply(LeftHand.Mat.Value, RightHand.Mat.Value, newMat, _ScaleFactor);
+                Mat.Value = newMat.Clone();
             }
         }
 

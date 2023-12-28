@@ -73,7 +73,7 @@ namespace ShadowEye.Model
             {
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
-                Mat = _cam.NextFrame();
+                Mat.Value = _cam.NextFrame();
                 if (IsShowingCurrentTab() || HowToUpdate.InUse)
                 {
                     UpdateDisplay();

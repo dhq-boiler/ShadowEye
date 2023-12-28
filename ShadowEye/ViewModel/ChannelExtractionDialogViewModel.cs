@@ -43,11 +43,11 @@ namespace ShadowEye.ViewModel
                 bool changed = SetProperty<AnalyzingSource>(ref _TargetImage, value, "TargetImage");
                 if (changed && _TargetImage != null)
                 {
-                    var channels = _TargetImage.Mat.Channels();
+                    var channels = _TargetImage.Mat.Value.Channels();
                     if (channels > 0)
                     {
                         Split = new ObservableCollection<WriteableBitmap>();
-                        var mat = _TargetImage.Mat;
+                        var mat = _TargetImage.Mat.Value;
                         var split = mat.Split();
                         for (int i = 0; i < channels; ++i)
                         {

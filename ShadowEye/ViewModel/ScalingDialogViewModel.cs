@@ -113,8 +113,8 @@ namespace ShadowEye.ViewModel
                 SetProperty<AnalyzingSource>(ref _SelectedItem, value, "SelectedItem");
                 if (_SelectedItem != null)
                 {
-                    _Width = _SelectedItem.Mat.Width;
-                    _Height = _SelectedItem.Mat.Height;
+                    _Width = _SelectedItem.Mat.Value.Width;
+                    _Height = _SelectedItem.Mat.Value.Height;
                     _WidthPercent = 100;
                     _HeightPercent = 100;
                     OnPropertyChanged("Width", "Height");
@@ -155,19 +155,19 @@ namespace ShadowEye.ViewModel
                     if (SizeIsPercent)
                     {
                         _WidthPercent = value;
-                        _Width = SelectedItem.Mat.Width * _WidthPercent / 100d;
+                        _Width = SelectedItem.Mat.Value.Width * _WidthPercent / 100d;
                     }
                     else
                     {
                         _Width = value;
-                        _WidthPercent = 100d * _Width / SelectedItem.Mat.Width;
+                        _WidthPercent = 100d * _Width / SelectedItem.Mat.Value.Width;
                     }
 
                     OnPropertyChanged("Width");
 
                     if (KeepAspectRatio)
                     {
-                        _Height = SelectedItem.Mat.Height * _WidthPercent / 100d;
+                        _Height = SelectedItem.Mat.Value.Height * _WidthPercent / 100d;
                         _HeightPercent = _WidthPercent;
                         if (!_ChangeFromHeight)
                         {
@@ -202,19 +202,19 @@ namespace ShadowEye.ViewModel
                     if (SizeIsPercent)
                     {
                         _HeightPercent = value;
-                        _Height = SelectedItem.Mat.Height * _HeightPercent / 100d;
+                        _Height = SelectedItem.Mat.Value.Height * _HeightPercent / 100d;
                     }
                     else
                     {
                         _Height = value;
-                        _HeightPercent = 100d * _Height / SelectedItem.Mat.Height;
+                        _HeightPercent = 100d * _Height / SelectedItem.Mat.Value.Height;
                     }
 
                     OnPropertyChanged("Height");
 
                     if (KeepAspectRatio)
                     {
-                        _Width = SelectedItem.Mat.Width * _HeightPercent / 100d;
+                        _Width = SelectedItem.Mat.Value.Width * _HeightPercent / 100d;
                         _WidthPercent = _HeightPercent;
                         if (!_ChangeFromWidth)
                         {

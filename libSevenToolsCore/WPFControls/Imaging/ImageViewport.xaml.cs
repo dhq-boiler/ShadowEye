@@ -182,17 +182,13 @@ namespace libSevenToolsCore.WPFControls.Imaging
         private static void OnSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ImageViewport ctrl = d as ImageViewport;
+
             if (ctrl != null)
             {
                 if (ctrl.Source != null)
                 {
                     ctrl.Source.Changed += ctrl.Source_Changed;
-                    ctrl.LockRendering();
-                    ctrl.ScaleFactor = 1.0;
-                    ctrl.OffsetX = 0;
-                    ctrl.OffsetY = 0;
-                    ctrl.Uniform();
-                    ctrl.UnlockRendering(true);
+                    ctrl.Render();
                 }
             }
         }

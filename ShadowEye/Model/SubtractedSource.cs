@@ -11,10 +11,10 @@ namespace ShadowEye.Model
         public SubtractedSource(string name, AnalyzingSource left, AnalyzingSource right, ComputingMethod method, EColorMode colorMode)
             : base(name)
         {
-            Debug.Assert(left.Mat.Width == right.Mat.Width);
-            Debug.Assert(left.Mat.Height == right.Mat.Height);
-            Debug.Assert(left.Mat.Type().Channels == right.Mat.Type().Channels);
-            Debug.Assert(left.Mat.Type().Depth == right.Mat.Type().Depth);
+            Debug.Assert(left.Mat.Value.Width == right.Mat.Value.Width);
+            Debug.Assert(left.Mat.Value.Height == right.Mat.Value.Height);
+            Debug.Assert(left.Mat.Value.Type().Channels == right.Mat.Value.Type().Channels);
+            Debug.Assert(left.Mat.Value.Type().Depth == right.Mat.Value.Type().Depth);
 
             this.HowToUpdate = HaveAnyDynamicUpdater(left, right);
 
@@ -23,7 +23,7 @@ namespace ShadowEye.Model
             Method = method;
             OutputColorType = colorMode;
             ChannelType = ConvertToChannelType(colorMode);
-            Mat = new Mat();
+            Mat.Value = new Mat();
 
             LeftHand.MatChanged += LeftHand_MatChanged;
             RightHand.MatChanged += RightHand_MatChanged;
@@ -45,15 +45,15 @@ namespace ShadowEye.Model
                 switch (Method)
                 {
                     case ComputingMethod.Subtract:
-                        Cv2.Subtract(LeftHand.Mat, RightHand.Mat, newMat);
+                        Cv2.Subtract(LeftHand.Mat.Value, RightHand.Mat.Value, newMat);
                         break;
                     case ComputingMethod.Subtract_Absolute:
-                        Cv2.Absdiff(LeftHand.Mat, RightHand.Mat, newMat);
+                        Cv2.Absdiff(LeftHand.Mat.Value, RightHand.Mat.Value, newMat);
                         break;
                     default:
                         throw new InvalidOperationException("Unknown computing method.");
                 }
-                Mat = newMat.Clone();
+                Mat.Value = newMat.Clone();
             }
         }
     }

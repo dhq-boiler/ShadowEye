@@ -1,221 +1,289 @@
 
 
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Windows.Forms;
+using Reactive.Bindings;
+using Reactive.Bindings.Disposables;
+using Reactive.Bindings.Extensions;
 using ShadowEye.Model;
 using ShadowEye.Utils;
+using ShadowEye.View.Dialogs;
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Windows.Controls;
+using System.Windows.Forms;
+using System.Collections.ObjectModel;
 
 namespace ShadowEye.ViewModel
 {
-    public class ScreenShotDialogViewModel : Notifier
+    public class ScreenShotDialogViewModel : Notifier, IDisposable
     {
-        private ScreenShotTarget _Target;
-        private bool _OnlyClientArea;
-        private ScreenShotDialogViewModel.PictureOrMovie _CapturingType;
-        private ScreenShotSource _ScreenShotSource;
-        private List<ProcessItem> _Processes;
-        private ProcessItem _SelectedProcess;
-        private ProcessItem.WindowInfo[] _WindowInfos;
-        private ProcessItem.WindowInfo _SelectedWindowInfo;
-        private Screen _SelectedScreen;
-        private MainWorkbenchViewModel _MainWorkbenchVM;
+        private static ScreenShotTarget _DefaultTarget;
+        private static bool _DefaultOnlyClientArea;
+        private static ScreenShotDialogViewModel.PictureOrMovie _DefaultCapturingType;
+        private static ProcessItem _DefaultSelectedProcess;
+        private static ProcessItem.WindowInfo _DefaultSelectedWindowInfo;
+        private static Screen _DefaultSelectedScreen;
         private static int s_createCount;
+
+        private ScreenShotArea _ScreenShotSourceArea;
+        private CompositeDisposable _disposables = new();
+
+        public ScreenShotDialog Dialog { get; set; }
+        public ReactivePropertySlim<MainWorkbenchViewModel> MainWorkbenchVM { get; } = new();
+        public ReactivePropertySlim<ScreenShotSource> Source { get; } = new();
+        public ReactivePropertySlim<ScreenShotTarget> Target { get; } = new();
+        public ReactivePropertySlim<bool> OnlyClientArea { get; } = new();
+        public ReactivePropertySlim<PictureOrMovie> CapturingType { get; } = new();
+        public ScreenOption[] Monitors => ScreenOption.CreateArray();
+        public ReactivePropertySlim<Screen> SelectedScreen { get; } = new();
+        public ReactiveCollection<ProcessItem> Processes { get; } = [];
+        public ReactivePropertySlim<ProcessItem> SelectedProcess { get; } = new();
+        public ReactiveCollection<ProcessItem.WindowInfo> WindowInfos { get; } = [];
+        public ReadOnlyReactivePropertySlim<bool> ProcessIsSelected => Target.CombineLatest(SelectedProcess, (t, sp) => t == ScreenShotTarget.Window && sp is not null).ToReadOnlyReactivePropertySlim();
+        public ReactivePropertySlim<ProcessItem.WindowInfo> SelectedWindowInfo { get; } = new();
+        public ReactiveCommandSlim<SelectionChangedEventArgs> SelectScreenCommand { get; } = new();
+        public ReactiveCommandSlim<SelectionChangedEventArgs> SelectProcessCommand { get; } = new();
+        public ReactiveCommandSlim<SelectionChangedEventArgs> SelectWindowCommand { get; } = new();
+        public ReactiveCommandSlim ShootCommand { get; } = new();
+        public ReactiveCommandSlim CancelCommand { get; } = new();
+        public ReactiveCommandSlim SaveFileCommand { get; } = new();
+        public ReactiveCommandSlim LoadedCommand { get; } = new();
+        public ReactiveCommandSlim ClosedCommand { get; } = new();
 
         public ScreenShotDialogViewModel(MainWorkbenchViewModel imageContainerVM)
         {
-            MainWorkbenchVM = imageContainerVM;
-            _ScreenShotSource = new ScreenShotSource("ScreenShot");
-            PropertyChanged += ScreenShotDialogViewModel_PropertyChanged;
-            Target = ScreenShotTarget.VirtualScreen; //初期状態はVirtualScreen選択
-            CapturingType = PictureOrMovie.Picture; //初期状態はPicture選択
-            _ScreenShotSource.UpdateImage();
+            LoadedCommand.Subscribe(() =>
+            {
+                Initialize();
+                Source.Value.HowToUpdate.Request();
+            }).AddTo(_disposables);
+            ClosedCommand.Subscribe(() =>
+            {
+                Source.Value.HowToUpdate.RequestAccomplished();
+            }).AddTo(_disposables);
+            ShootCommand.Subscribe(() =>
+            {
+                AddComputeTab();
+                Dialog.DialogResult = true;
+            }).AddTo(_disposables);
+            CancelCommand.Subscribe(() =>
+            {
+                Dialog.DialogResult = false;
+            }).AddTo(_disposables);
+            SelectScreenCommand.Subscribe(e =>
+            {
+                if (Source.Value.Area is ScreenShotScreen)
+                {
+                    SelectedScreen.Value = (e.AddedItems.Cast<Screen>().Except(e.RemovedItems.Cast<Screen>()) as ScreenOption)?.Target;
+                    (Source.Value.Area as ScreenShotScreen).SelectedScreen = SelectedScreen.Value;
+                    if (Source.Value.HowToUpdate is StaticUpdater)
+                    {
+                        Source.Value.UpdateImage();
+                    }
+                }
+            }).AddTo(_disposables);
+            SelectProcessCommand.Subscribe(e =>
+            {
+                Source.Value.Area = new ScreenShotWindow();
+                
+                if (Source.Value.Area is ScreenShotWindow area)
+                {
+                    area.SelectedProcess = SelectedProcess.Value?.Process;
+                    area.OnlyClientArea = OnlyClientArea.Value;
+                }
+
+                if (Source.Value.HowToUpdate is StaticUpdater)
+                {
+                    Source.Value.UpdateImage();
+                }
+
+                UpdateWindowInfos();
+
+                if (Source.Value.Area is ScreenShotWindow)
+                {
+                    SelectWindowHandle();
+                }
+            }).AddTo(_disposables);
+            SelectWindowCommand.Subscribe(e =>
+            {
+                if (Source.Value.Area is ScreenShotWindow window && SelectedWindowInfo.Value is not null)
+                {
+                    window.SelectedProcess = SelectedProcess.Value?.Process;
+                    window.OnlyClientArea = OnlyClientArea.Value;
+                    window.SelectedWindowHandle = SelectedWindowInfo.Value.WindowHandle;
+                    if (Source.Value.HowToUpdate is StaticUpdater)
+                    {
+                        Source.Value.UpdateImage();
+                    }
+                }
+            }).AddTo(_disposables);
+            Target.Subscribe(target =>
+            {
+                if (Source.Value is null)
+                    return;
+                SwitchTarget();
+                Source.Value.UpdateImage();
+            }).AddTo(_disposables);
+            OnlyClientArea.Subscribe(onlyClientArea =>
+            {
+                if (Source.Value is null || Source.Value.Area is not ScreenShotWindow sss) return;
+                sss.OnlyClientArea = OnlyClientArea.Value;
+                Source.Value.UpdateImage();
+            }).AddTo(_disposables);
+            CapturingType.Subscribe(capturingType =>
+            {
+                if (Source.Value is null) return;
+                SwitchCapturingType();
+                Source.Value.UpdateImage();
+            }).AddTo(_disposables);
+
+            MainWorkbenchVM.Value = imageContainerVM;
+            Source.Value = new ScreenShotSource("ScreenShot");
             UpdateProcesses();
+            Initialize(); 
+            Source.Value.UpdateImage();
         }
 
-        private void ScreenShotDialogViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        public void Initialize()
         {
-            switch (e.PropertyName)
+            Target.Value = _DefaultTarget != ScreenShotTarget.Unknown ? _DefaultTarget : ScreenShotTarget.VirtualScreen; //初期状態はVirtualScreen選択
+            CapturingType.Value = _DefaultCapturingType != PictureOrMovie.Unknown ? _DefaultCapturingType : PictureOrMovie.Picture; //初期状態はPicture選択
+            if (_DefaultSelectedScreen is not null)
             {
-                case "Target":
-                    SwitchTarget();
-                    _ScreenShotSource.UpdateImage();
-                    break;
-                case "OnlyClientArea":
-                    if (_ScreenShotSource.Area is ScreenShotWindow)
-                    {
-                        var sss = _ScreenShotSource.Area as ScreenShotWindow;
-                        sss.OnlyClientArea = OnlyClientArea;
-                        _ScreenShotSource.UpdateImage();
-                    }
-                    break;
-                case "CapturingType":
-                    SwitchCapturingType();
-                    _ScreenShotSource.UpdateImage();
-                    break;
+                SelectedScreen.Value = _DefaultSelectedScreen;
             }
+            if (_DefaultSelectedProcess is not null)
+            {
+                SelectedProcess.Value = _DefaultSelectedProcess;
+            }
+
+            if (_DefaultSelectedWindowInfo is not null)
+            {
+                SelectedWindowInfo.Value = _DefaultSelectedWindowInfo;
+            }
+
+            Source.Value.HowToUpdate.RequestAccomplished();
+
+            if (_ScreenShotSourceArea is not null)
+            {
+                Source.Value.Area = _ScreenShotSourceArea;
+            }
+            else
+            {
+                switch (Target.Value)
+                {
+                    case ScreenShotTarget.VirtualScreen:
+                        Source.Value.Area = new ScreenShotVirtualScreen();
+                        break;
+                    case ScreenShotTarget.Screen:
+                        Source.Value.Area = new ScreenShotScreen();
+                        break;
+                    case ScreenShotTarget.Desktop:
+                        Source.Value.Area = new ScreenShotDesktop();
+                        break;
+                    case ScreenShotTarget.Window:
+                        Source.Value.Area = new ScreenShotWindow();
+                        break;
+                }
+            }
+
+            Source.Value.HowToUpdate.Request();
         }
 
         private void SwitchCapturingType()
         {
-            _ScreenShotSource.HowToUpdate.ForceStop();
+            if (Source.Value is null)
+                return;
 
-            switch (CapturingType)
+            Source.Value.HowToUpdate.ForceStop();
+
+            switch (CapturingType.Value)
             {
                 case PictureOrMovie.Picture:
-                    _ScreenShotSource.HowToUpdate = new StaticUpdater(_ScreenShotSource);
+                    Source.Value.HowToUpdate = new StaticUpdater(Source.Value);
                     break;
                 case PictureOrMovie.Movie:
-                    _ScreenShotSource.HowToUpdate = new DynamicUpdater(_ScreenShotSource);
+                    Source.Value.HowToUpdate = new DynamicUpdater(Source.Value);
                     break;
                 case PictureOrMovie.Film:
-                    _ScreenShotSource.HowToUpdate = new ManualUpdater(_ScreenShotSource);
+                    Source.Value.HowToUpdate = new ManualUpdater(Source.Value);
                     break;
             }
 
-            _ScreenShotSource.HowToUpdate.Request();
+            Source.Value.HowToUpdate.Request();
         }
 
         private void SwitchTarget()
         {
-            _ScreenShotSource.HowToUpdate.RequestAccomplished();
+            if (Source.Value is null)
+                return;
 
-            switch (Target)
+            Source.Value.HowToUpdate.RequestAccomplished();
+
+            switch (Target.Value)
             {
                 case ScreenShotTarget.VirtualScreen:
-                    _ScreenShotSource.Area = new ScreenShotVirtualScreen();
+                    Source.Value.Area = new ScreenShotVirtualScreen();
                     break;
                 case ScreenShotTarget.Screen:
-                    _ScreenShotSource.Area = new ScreenShotScreen(SelectedScreen);
+                    Source.Value.Area = new ScreenShotScreen(SelectedScreen.Value);
                     break;
                 case ScreenShotTarget.Desktop:
-                    _ScreenShotSource.Area = new ScreenShotDesktop();
+                    Source.Value.Area = new ScreenShotDesktop();
                     break;
                 case ScreenShotTarget.Window:
-                    _ScreenShotSource.Area = new ScreenShotWindow(SelectedProcess != null ? SelectedProcess.Process : null);
+                    Source.Value.Area = new ScreenShotWindow(SelectedProcess.Value?.Process);
                     break;
             }
 
-            _ScreenShotSource.HowToUpdate.Request();
+            Source.Value.HowToUpdate.Request();
         }
-
-        public MainWorkbenchViewModel MainWorkbenchVM
-        {
-            get { return _MainWorkbenchVM; }
-            set { SetProperty<MainWorkbenchViewModel>(ref _MainWorkbenchVM, value, "MainWorkbenchVM"); }
-        }
-
-        public ScreenShotSource Source
-        {
-            get { return _ScreenShotSource; }
-            set { SetProperty<ScreenShotSource>(ref _ScreenShotSource, value, "Source"); }
-        }
-
-        public ScreenShotTarget Target
-        {
-            get { return _Target; }
-            set
-            {
-                if (value == ScreenShotTarget.Unknown) return;
-                SetProperty<ScreenShotTarget>(ref _Target, value, "Target");
-            }
-        }
-
-        public bool OnlyClientArea
-        {
-            get { return _OnlyClientArea; }
-            set { SetProperty<bool>(ref _OnlyClientArea, value, "OnlyClientArea"); }
-        }
-
-        public PictureOrMovie CapturingType
-        {
-            get { return _CapturingType; }
-            set { SetProperty<PictureOrMovie>(ref _CapturingType, value, "CapturingType"); }
-        }
-
-        public ScreenOption[] Monitors
-        {
-            get { return ScreenOption.CreateArray(); }
-        }
-
-        public Screen SelectedScreen
-        {
-            get { return _SelectedScreen; }
-            set { SetProperty<Screen>(ref _SelectedScreen, value, "SelectedScreen"); }
-        }
-
-        public ProcessItem[] Processes
-        {
-            get
-            {
-                return _Processes.ToArray();
-            }
-        }
-
-        public ProcessItem SelectedProcess
-        {
-            get { return _SelectedProcess; }
-            set { SetProperty<ProcessItem>(ref _SelectedProcess, value, "SelectedProcess", "WindowInfos", "IsSelectedProcess"); }
-        }
-
-        public ProcessItem.WindowInfo[] WindowInfos
-        {
-            get
-            {
-                return _WindowInfos?.ToArray();
-            }
-        }
-
-        public ProcessItem.WindowInfo SelectedWindowInfo
-        {
-            get { return _SelectedWindowInfo; }
-            set { SetProperty(ref _SelectedWindowInfo, value, "SelectedWindowInfo"); }
-        }
-
-        public bool IsSelectedProcess
-        {
-            get { return Target == ScreenShotTarget.Window && SelectedProcess != null; }
-        }
-
         public void UpdateProcesses()
         {
-            _Processes = new List<ProcessItem>();
+            Processes.Clear();
             foreach (var p in Process.GetProcesses())
             {
-                if (p.MainWindowTitle.Count() == 0) continue;
-                _Processes.Add(new ProcessItem(p));
+                if (!p.MainWindowTitle.Any()) continue;
+                Processes.Add(new ProcessItem(p));
             }
-            OnPropertyChanged("Processes");
         }
 
         public void UpdateWindowInfos()
         {
-            if (SelectedProcess == null)
+            if (SelectedProcess.Value is null)
                 return;
-            var wis = ScreenShotWindow.EnumWindows(SelectedProcess.Process);
-            _WindowInfos = wis.ToArray();
-            OnPropertyChanged("WindowInfos");
+            WindowInfos.Clear();
+            var wis = ScreenShotWindow.EnumWindows(SelectedProcess.Value.Process);
+            //wis.ToList().ForEach(x => WindowInfos.Add(x));
+            WindowInfos.AddRange(wis);
         }
 
-        public void SelectMainWindowHandle()
+        public void SelectWindowHandle()
         {
             if (SelectedProcess == null)
                 return;
-            SelectedWindowInfo = WindowInfos.Where(a => a.WindowHandle.Equals(SelectedProcess.Process.MainWindowHandle)).Single();
+            SelectedWindowInfo.Value = WindowInfos.SingleOrDefault(a => a.WindowHandle.Equals(SelectedProcess.Value.Process.MainWindowHandle));
         }
 
         public void AddComputeTab()
         {
             var source = (AnalyzingSource)new DummySource();
-            source = _ScreenShotSource;
-            source.Name = string.Format("ScreenShot-{0}", ++s_createCount);
-            if (CapturingType == PictureOrMovie.Film)
+            source = Source.Value;
+            source.Name = $"ScreenShot-{++s_createCount}";
+            if (CapturingType.Value == PictureOrMovie.Film)
             {
                 source = new FilmSource($"Film-{++s_createCount}", source);
-                (source as FilmSource).StartRecoding();
+                ((FilmSource)source).StartRecoding();
             }
-            MainWorkbenchVM.AddOrActive(source);
+            MainWorkbenchVM.Value.AddOrActive(source);
+
+            _DefaultTarget = Target.Value;
+            _DefaultCapturingType = CapturingType.Value;
+            _DefaultSelectedScreen = SelectedScreen.Value;
+            _DefaultSelectedProcess = SelectedProcess.Value;
+            _DefaultSelectedWindowInfo = SelectedWindowInfo.Value;
+            _ScreenShotSourceArea = Source.Value.Area;
         }
 
         public enum ScreenShotTarget
@@ -233,6 +301,24 @@ namespace ShadowEye.ViewModel
             Picture,
             Movie,
             Film,
+        }
+
+        public void Dispose()
+        {
+            _disposables?.Dispose();
+            WindowInfos?.Dispose();
+            MainWorkbenchVM?.Dispose();
+            Source?.Dispose();
+            Target?.Dispose();
+            OnlyClientArea?.Dispose();
+            CapturingType?.Dispose();
+            SelectedScreen?.Dispose();
+            Processes?.Dispose();
+            SelectedProcess?.Dispose();
+            SelectedWindowInfo?.Dispose();
+            SelectScreenCommand?.Dispose();
+            SelectProcessCommand?.Dispose();
+            SelectWindowCommand?.Dispose();
         }
     }
 }

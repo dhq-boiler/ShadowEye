@@ -94,7 +94,7 @@ namespace ShadowEye.Model
                 {
                     Compute();
 
-                    if (Mat.Type().Channels == 3)
+                    if (Mat.Value.Type().Channels == 3)
                     {
                         switch (OutputColorType)
                         {
@@ -107,11 +107,11 @@ namespace ShadowEye.Model
                                 this.ChannelType = libimgengCore.ChannelType.BGR24;
                                 break;
                             case EColorMode.RGB:
-                                Cv2.CvtColor(Mat, Mat, ColorConversionCodes.BGR2RGB);
+                                Cv2.CvtColor(Mat.Value, Mat.Value, ColorConversionCodes.BGR2RGB);
                                 this.ChannelType = libimgengCore.ChannelType.RGB;
                                 break;
                             case EColorMode.Grayscale:
-                                Cv2.CvtColor(Mat, Mat, ColorConversionCodes.BGR2GRAY);
+                                Cv2.CvtColor(Mat.Value, Mat.Value, ColorConversionCodes.BGR2GRAY);
                                 this.ChannelType = libimgengCore.ChannelType.Gray;
                                 break;
                             default:
@@ -125,9 +125,9 @@ namespace ShadowEye.Model
                 }
                 finally
                 {
-                    if (Mat != null && (!AnyDynamicSource() || IsShowingCurrentTab()))
+                    if (Mat.Value != null && (!AnyDynamicSource() || IsShowingCurrentTab()))
                     {
-                        SetBitmapFromMat(Mat);
+                        SetBitmapFromMat(Mat.Value);
                         OnSourceUpdated(this, new EventArgs());
                     }
                 }

@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converter="clr-namespace:ShadowEye.View.Controls.Converter"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:ShadowEye.Model"
     xmlns:sti="clr-namespace:libSevenToolsCore.WPFControls.Imaging;assembly=libSevenToolsCore"
@@ -30,6 +31,11 @@
                 <Setter.Value>
                     <DataTemplate DataType="{x:Type vvm:ImageViewModel}">
                         <DockPanel>
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Loaded">
+                                    <i:CallMethodAction MethodName="Uniform" TargetObject="{Binding ElementName=imageViewport}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
                             <DockPanel
                                 x:Name="StopRecordingButtonPanel"
                                 DockPanel.Dock="Bottom"
@@ -107,10 +113,11 @@
                                 </Slider>
                             </DockPanel>
                             <sti:ImageViewport
+                                x:Name="imageViewport"
                                 Interpolation="Bilinear"
                                 PixelPointed="ImageViewport_PixelPointed"
                                 ShowTransparentGrid="True"
-                                Source="{Binding Mode=OneWay, Path=Source.Bitmap}" />
+                                Source="{Binding Mode=OneWay, Path=Source.Bitmap.Value}" />
                         </DockPanel>
                     </DataTemplate>
                 </Setter.Value>

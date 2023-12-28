@@ -66,7 +66,7 @@ namespace ShadowEye.ViewModel
             {
                 _task = new Task(() =>
                     {
-                        source.Bitmap.Dispatcher.Invoke(() =>
+                        source.Bitmap.Value.Dispatcher.Invoke(() =>
                             {
                                 Stopwatch sw = new Stopwatch();
                                 sw.Start();
@@ -101,7 +101,7 @@ namespace ShadowEye.ViewModel
                 {
                     InitHistogram(source);
                 }
-                Histogram.Calculate(source.Mat);
+                Histogram.Calculate(source.Mat.Value);
             }
             else
             {
@@ -120,7 +120,7 @@ namespace ShadowEye.ViewModel
             Histogram.PropertyChanged += (s, ea) => OnPropertyChanged();
             if (source.Mat != null)
             {
-                Histogram.Initialize(source.Mat, source.ChannelType);
+                Histogram.Initialize(source.Mat.Value, source.ChannelType);
             }
             else
             {

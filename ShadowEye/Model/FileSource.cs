@@ -16,7 +16,7 @@ namespace ShadowEye.Model
                 this.HowToUpdate = new StaticUpdater(this);
                 Location = new Uri(path);
                 UpdateImage();
-                ChannelType = GetChannelType(Bitmap.Format);
+                ChannelType = GetChannelType(Bitmap.Value.Format);
             }
             catch (ArgumentException)
             {
@@ -32,7 +32,7 @@ namespace ShadowEye.Model
                 return libimgengCore.ChannelType.BGR32;
             else if (pixelFormat == PixelFormats.Bgra32)
                 return libimgengCore.ChannelType.BGRA;
-            else if (pixelFormat == PixelFormats.Gray8 || (Mat != null && Mat.Type().Channels == 1))
+            else if (pixelFormat == PixelFormats.Gray8 || (Mat.Value != null && Mat.Value.Type().Channels == 1))
                 return libimgengCore.ChannelType.Gray;
             else if (pixelFormat == PixelFormats.Rgb24)
                 return libimgengCore.ChannelType.RGB;
@@ -44,8 +44,8 @@ namespace ShadowEye.Model
         {
             try
             {
-                Mat = new Mat(Location.LocalPath, ImreadModes.Unchanged);
-                SetBitmapFromMat(Mat);
+                Mat.Value = new Mat(Location.LocalPath, ImreadModes.Unchanged);
+                SetBitmapFromMat(Mat.Value);
                 OnSourceUpdated(this, new EventArgs());
             }
             catch (ArgumentException)

@@ -27,10 +27,10 @@ namespace ShadowEye.Model
 
         public override void Compute()
         {
-            using (Mat newMat = new Mat(Height, Width, LeftHand.Mat.Type()))
+            using (Mat newMat = new Mat(Height, Width, LeftHand.Mat.Value.Type()))
             {
-                Cv2.Resize(LeftHand.Mat, newMat, new Size(Width, Height));
-                Mat = newMat.Clone();
+                Cv2.Resize(LeftHand.Mat.Value, newMat, new Size(Width, Height));
+                Mat.Value = newMat.Clone();
             }
         }
 

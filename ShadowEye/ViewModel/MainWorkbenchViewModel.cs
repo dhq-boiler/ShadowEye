@@ -59,7 +59,7 @@ namespace ShadowEye.ViewModel
         private void CopyImageToClipboard(ImageViewModel imageViewModel)
         {
             var source = imageViewModel.Source;
-            Clipboard.SetImage(source.Bitmap);
+            Clipboard.SetImage(source.Bitmap.Value);
         }
 
         internal void SaveAsDialogOpen(AnalyzingSource source)
@@ -96,7 +96,7 @@ namespace ShadowEye.ViewModel
                 else if (Path.GetExtension(dialog.FileName) == ".mp4")
                 {
                     var filmSource = source as FilmSource;
-                    using (VideoWriter videoWriter = new VideoWriter(dialog.FileName, FourCC.H264, filmSource.Frames.Count() / (filmSource.Frames.Sum(x => x.Item2.Milliseconds) / 1000d), new Size(source.Mat.Width, source.Mat.Height)))
+                    using (VideoWriter videoWriter = new VideoWriter(dialog.FileName, FourCC.H264, filmSource.Frames.Count() / (filmSource.Frames.Sum(x => x.Item2.Milliseconds) / 1000d), new Size(source.Mat.Value.Width, source.Mat.Value.Height)))
                     {
                         var list = filmSource.Frames.Skip(filmSource.SelectionStart.Value + 1);
                         foreach (var mat in list.Take(filmSource.SelectionEnd.Value - filmSource.SelectionStart.Value).Select(x => x.Item1))
@@ -107,7 +107,7 @@ namespace ShadowEye.ViewModel
                 }
                 else
                 {
-                    source.Mat.SaveImage(dialog.FileName);
+                    source.Mat.Value.SaveImage(dialog.FileName);
                 }
 
                 _previousSaveDir = Path.GetDirectoryName(dialog.FileName);
@@ -154,7 +154,7 @@ namespace ShadowEye.ViewModel
                 else if (Path.GetExtension(dialog.FileName) == ".mp4")
                 {
                     var filmSource = ivm.Source as FilmSource;
-                    using (VideoWriter videoWriter = new VideoWriter(dialog.FileName, FourCC.H264, filmSource.Frames.Count() / (filmSource.Frames.Sum(x => x.Item2.Milliseconds) / 1000d), new Size(ivm.Source.Mat.Width, ivm.Source.Mat.Height)))
+                    using (VideoWriter videoWriter = new VideoWriter(dialog.FileName, FourCC.H264, filmSource.Frames.Count() / (filmSource.Frames.Sum(x => x.Item2.Milliseconds) / 1000d), new Size(ivm.Source.Mat.Value.Width, ivm.Source.Mat.Value.Height)))
                     {
                         var list = filmSource.Frames.Skip(filmSource.SelectionStart.Value + 1);
                         foreach (var mat in list.Take(filmSource.SelectionEnd.Value - filmSource.SelectionStart.Value).Select(x => x.Item1))
@@ -165,7 +165,7 @@ namespace ShadowEye.ViewModel
                 }
                 else
                 {
-                    ivm.Source.Mat.SaveImage(dialog.FileName);
+                    ivm.Source.Mat.Value.SaveImage(dialog.FileName);
                 }
 
                 _previousSaveDir = Path.GetDirectoryName(dialog.FileName);

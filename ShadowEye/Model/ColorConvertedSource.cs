@@ -14,7 +14,7 @@ namespace ShadowEye.Model
         {
             Debug.Assert(target != null);
             Debug.Assert(target.Mat != null);
-            Debug.Assert(target.Mat.Rows != 0 && target.Mat.Cols != 0);
+            Debug.Assert(target.Mat.Value.Rows != 0 && target.Mat.Value.Cols != 0);
 
             this.HowToUpdate = target.HowToUpdate.SameUpdater(target);
 
@@ -31,8 +31,8 @@ namespace ShadowEye.Model
         {
             using (Mat newMat = new Mat())
             {
-                Cv2.CvtColor(LeftHand.Mat, newMat, _ColorConversion);
-                Mat = newMat.Clone();
+                Cv2.CvtColor(LeftHand.Mat.Value, newMat, _ColorConversion);
+                Mat.Value = newMat.Clone();
             }
         }
 

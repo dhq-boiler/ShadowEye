@@ -32,7 +32,7 @@ namespace ShadowEye.Model
 
         public override void Compute()
         {
-            using (Mat newMat = new Mat(LeftHand.Mat.Rows, LeftHand.Mat.Cols, MatType.CV_8UC1))
+            using (Mat newMat = new Mat(LeftHand.Mat.Value.Rows, LeftHand.Mat.Value.Cols, MatType.CV_8UC1))
             {
                 switch (Method)
                 {
@@ -41,12 +41,12 @@ namespace ShadowEye.Model
                     case ComputingMethod.Threshold_ToZero:
                     case ComputingMethod.Threshold_ToZero_Inverse:
                     case ComputingMethod.Threshold_Trunc:
-                        Threshold(LeftHand.Mat, newMat, ThresholdValue, ThresholdingMaxValue, ToThresholdType(Method));
+                        Threshold(LeftHand.Mat.Value, newMat, ThresholdValue, ThresholdingMaxValue, ToThresholdType(Method));
                         break;
                     default:
                         throw new InvalidOperationException("Unknown computing method.");
                 }
-                Mat = newMat.Clone();
+                Mat.Value = newMat.Clone();
             }
         }
 

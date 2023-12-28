@@ -150,8 +150,12 @@ namespace ShadowEye.ViewModel
 
         private void SelectScreenShotModeDialogOpen()
         {
-            ScreenShotDialog dialog = new ScreenShotDialog();
-            dialog.DataContext = new ScreenShotDialogViewModel(_imageContainerVM);
+            var vm = new ScreenShotDialogViewModel(_imageContainerVM);
+            var dialog = new ScreenShotDialog
+            {
+                DataContext = vm
+            };
+            vm.Dialog = dialog;
             dialog.ShowDialog();
         }
 
