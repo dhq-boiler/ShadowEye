@@ -239,7 +239,7 @@ namespace ShadowEye.ViewModel
                     string.Format("Scaled-{0}", ++s_createCount),
                     SelectedItem,
                     (int)Math.Round(_Width), (int)Math.Round(_Height));
-                (App.Current.MainWindow as MainWindow).MainWindowVM.ImageContainerVM.AddOrActive(source);
+                MainWindow.MainWindowVM.ImageContainerVM.AddOrActive(source);
             }
             catch (OpenCvSharp.OpenCVException e)
             {

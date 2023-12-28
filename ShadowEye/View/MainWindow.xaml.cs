@@ -23,7 +23,7 @@ namespace ShadowEye.View
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindowViewModel MainWindowVM { get; set; }
+        public static MainWindowViewModel MainWindowVM { get; set; }
 
         public MainWindow()
         {
