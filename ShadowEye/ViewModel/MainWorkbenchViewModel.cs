@@ -10,7 +10,9 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Media.Imaging;
+using Size = OpenCvSharp.Size;
 
 namespace ShadowEye.ViewModel
 {
@@ -31,6 +33,10 @@ namespace ShadowEye.ViewModel
 
         private void RegisterCommands()
         {
+            base.RegisterCommand(RoutedCommands.CopyImageToClipboardCommand, (object p) => true, (object p) =>
+            {
+                this.CopyImageToClipboard(p as ImageViewModel);
+            });
             base.RegisterCommand(RoutedCommands.SaveAsCommand, (object p) => true, (object p) =>
             {
                 this.SaveAsDialogOpen(p as ImageViewModel);
@@ -45,6 +51,12 @@ namespace ShadowEye.ViewModel
                 AnalyzingSource asrc = ivm.Source as AnalyzingSource;
                 this.MainWindowVM.ImageContainerVM.AddOrActive(new DiscadedSource(asrc));
             });
+        }
+
+        private void CopyImageToClipboard(ImageViewModel imageViewModel)
+        {
+            var source = imageViewModel.Source;
+            Clipboard.SetImage(source.Bitmap);
         }
 
         internal void SaveAsDialogOpen(AnalyzingSource source)
