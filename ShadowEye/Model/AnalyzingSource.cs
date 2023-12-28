@@ -88,6 +88,9 @@ namespace ShadowEye.Model
 
         protected void SetBitmapFromMat(Mat mat)
         {
+            if (App.Current is null)
+                return;
+
             App.Current.Dispatcher.Invoke(() =>
             {
                 lock (mat)
@@ -159,9 +162,10 @@ namespace ShadowEye.Model
 
         protected bool IsShowingCurrentTab()
         {
-            return App.Current.Dispatcher.Invoke(() =>
-                (App.Current.MainWindow as MainWindow).MainWindowVM.ImageContainerVM.SelectedImageVM != null
-                && (App.Current.MainWindow as MainWindow).MainWindowVM.ImageContainerVM.SelectedImageVM.Source
+            return App.Current is not null &&
+                   App.Current.Dispatcher.Invoke(() =>
+                MainWindow.MainWindowVM.ImageContainerVM.SelectedImageVM != null
+                && MainWindow.MainWindowVM.ImageContainerVM.SelectedImageVM.Source
                 .Equals(this));
         }
 
