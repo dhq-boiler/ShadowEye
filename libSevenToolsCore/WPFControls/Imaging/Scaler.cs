@@ -14,17 +14,13 @@ namespace libSevenToolsCore.WPFControls.Imaging
             long step, int channels,
             out int p0)
         {
-            switch (method)
+            return method switch
             {
-                case Interpolation.NearestNeighbor:
-                    return NearestNeighbor(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0);
-                case Interpolation.Bilinear:
-                    return Bilinear(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0);
-                case Interpolation.Bicubic:
-                    return Bicubic(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0);
-                default:
-                    throw new NotSupportedException();
-            }
+                Interpolation.NearestNeighbor => NearestNeighbor(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0),
+                Interpolation.Bilinear => Bilinear(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0),
+                Interpolation.Bicubic => Bicubic(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0),
+                _ => throw new NotSupportedException(),
+            };
         }
 
         internal unsafe static bool Interplate(Interpolation method, byte* p_s,
@@ -34,17 +30,13 @@ namespace libSevenToolsCore.WPFControls.Imaging
             long step, int channels,
             out int p0, out int p1, out int p2)
         {
-            switch (method)
+            return method switch
             {
-                case Interpolation.NearestNeighbor:
-                    return NearestNeighbor(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2);
-                case Interpolation.Bilinear:
-                    return Bilinear(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2);
-                case Interpolation.Bicubic:
-                    return Bicubic(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2);
-                default:
-                    throw new NotSupportedException();
-            }
+                Interpolation.NearestNeighbor => NearestNeighbor(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2),
+                Interpolation.Bilinear => Bilinear(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2),
+                Interpolation.Bicubic => Bicubic(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2),
+                _ => throw new NotSupportedException(),
+            };
         }
 
         internal unsafe static bool Interplate(Interpolation method, byte* p_s,
@@ -54,17 +46,13 @@ namespace libSevenToolsCore.WPFControls.Imaging
             long step, int channels,
             out int p0, out int p1, out int p2, out int p3)
         {
-            switch (method)
+            return method switch
             {
-                case Interpolation.NearestNeighbor:
-                    return NearestNeighbor(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2, out p3);
-                case Interpolation.Bilinear:
-                    return Bilinear(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2, out p3);
-                case Interpolation.Bicubic:
-                    return Bicubic(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2, out p3);
-                default:
-                    throw new NotSupportedException();
-            }
+                Interpolation.NearestNeighbor => NearestNeighbor(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2, out p3),
+                Interpolation.Bilinear => Bilinear(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2, out p3),
+                Interpolation.Bicubic => Bicubic(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2, out p3),
+                _ => throw new NotSupportedException(),
+            };
         }
 
         private static unsafe bool Bicubic(byte* p_s, double x, double y, int min_x, int max_x, int min_y, int max_y, long step, int channels, out int p0)
