@@ -7,52 +7,64 @@ namespace libSevenToolsCore.WPFControls.Imaging
 {
     internal static class Scaler
     {
-        internal unsafe static bool Interpolate(Interpolation method, byte* p_s,
+        internal static unsafe bool Interpolate(Interpolation method, byte* p_s,
             double x, double y,
             int min_x, int max_x,
             int min_y, int max_y,
             long step, int channels,
             out int p0)
         {
-            return method switch
+            switch (method)
             {
-                Interpolation.NearestNeighbor => NearestNeighbor(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0),
-                Interpolation.Bilinear => Bilinear(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0),
-                Interpolation.Bicubic => Bicubic(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0),
-                _ => throw new NotSupportedException(),
-            };
+                case Interpolation.NearestNeighbor:
+                    return NearestNeighbor(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0);
+                case Interpolation.Bilinear:
+                    return Bilinear(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0);
+                case Interpolation.Bicubic:
+                    return Bicubic(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0);
+                default:
+                    throw new NotSupportedException();
+            }
         }
 
-        internal unsafe static bool Interpolate(Interpolation method, byte* p_s,
+        internal static unsafe bool Interpolate(Interpolation method, byte* p_s,
             double x, double y,
             int min_x, int max_x,
             int min_y, int max_y,
             long step, int channels,
             out int p0, out int p1, out int p2)
         {
-            return method switch
+            switch (method)
             {
-                Interpolation.NearestNeighbor => NearestNeighbor(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2),
-                Interpolation.Bilinear => Bilinear(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2),
-                Interpolation.Bicubic => Bicubic(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2),
-                _ => throw new NotSupportedException(),
-            };
+                case Interpolation.NearestNeighbor:
+                    return NearestNeighbor(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2);
+                case Interpolation.Bilinear:
+                    return Bilinear(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2);
+                case Interpolation.Bicubic:
+                    return Bicubic(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2);
+                default:
+                    throw new NotSupportedException();
+            }
         }
 
-        internal unsafe static bool Interpolate(Interpolation method, byte* p_s,
+        internal static unsafe bool Interpolate(Interpolation method, byte* p_s,
             double x, double y,
             int min_x, int max_x,
             int min_y, int max_y,
             long step, int channels,
             out int p0, out int p1, out int p2, out int p3)
         {
-            return method switch
+            switch (method)
             {
-                Interpolation.NearestNeighbor => NearestNeighbor(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2, out p3),
-                Interpolation.Bilinear => Bilinear(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2, out p3),
-                Interpolation.Bicubic => Bicubic(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2, out p3),
-                _ => throw new NotSupportedException(),
-            };
+                case Interpolation.NearestNeighbor:
+                    return NearestNeighbor(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2, out p3);
+                case Interpolation.Bilinear:
+                    return Bilinear(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2, out p3);
+                case Interpolation.Bicubic:
+                    return Bicubic(p_s, x, y, min_x, max_x, min_y, max_y, step, channels, out p0, out p1, out p2, out p3);
+                default:
+                    throw new NotSupportedException();
+            }
         }
 
         private static unsafe bool Bicubic(byte* p_s, double x, double y, int min_x, int max_x, int min_y, int max_y, long step, int channels, out int p0)
@@ -447,21 +459,17 @@ namespace libSevenToolsCore.WPFControls.Imaging
 
         private static byte linarPol(int p0, int p1, int p2, int p3, double xrate, double yrate)
         {
-            double d = p0 * (1.0 - xrate) + p2 * xrate;
-            double e = p1 * (1.0 - xrate) + p3 * xrate;
-            double f = d * (1.0 - yrate) + e * yrate;
+            double f = (p0 * (1.0 - xrate) + p2 * xrate) * (1.0 - yrate) + (p1 * (1.0 - xrate) + p3 * xrate) * yrate;
 
             // 四捨五入の代わりに整数演算で近似する場合
             int res = (int)(f + 0.5);
 
             // 結果をバイト値の範囲にクランプ
-            if (res < 0) return 0;
-            if (res > 255) return 255;
-            return (byte)res;
+            return Math.Clamp((byte)res, (byte)0, (byte)255);
         }
 
 
-        private unsafe static bool NearestNeighbor(byte* p_s,
+        private static unsafe bool NearestNeighbor(byte* p_s,
             double x, double y,
             int min_x, int max_x,
             int min_y, int max_y,
@@ -485,7 +493,7 @@ namespace libSevenToolsCore.WPFControls.Imaging
         }
 
 
-        private unsafe static bool NearestNeighbor(byte* p_s,
+        private static unsafe bool NearestNeighbor(byte* p_s,
             double x, double y,
             int min_x, int max_x,
             int min_y, int max_y,
@@ -512,7 +520,7 @@ namespace libSevenToolsCore.WPFControls.Imaging
         }
 
 
-        private unsafe static bool NearestNeighbor(byte* p_s,
+        private static unsafe bool NearestNeighbor(byte* p_s,
             double x, double y,
             int min_x, int max_x,
             int min_y, int max_y,
