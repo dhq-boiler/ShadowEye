@@ -110,6 +110,9 @@
                                 ItemsSource="{Binding Processes}"
                                 SelectedItem="{Binding SelectedProcess.Value, Mode=TwoWay}">
                                 <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="DropDownOpened">
+                                        <i:InvokeCommandAction Command="{Binding UpdateProcessesCommand}" />
+                                    </i:EventTrigger>
                                     <i:EventTrigger EventName="SelectionChanged">
                                         <i:InvokeCommandAction Command="{Binding SelectProcessCommand}" PassEventArgsToCommand="True" />
                                     </i:EventTrigger>

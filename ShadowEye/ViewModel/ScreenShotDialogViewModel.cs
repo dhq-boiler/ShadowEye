@@ -50,6 +50,7 @@ namespace ShadowEye.ViewModel
         public ReactiveCommandSlim SaveFileCommand { get; } = new();
         public ReactiveCommandSlim LoadedCommand { get; } = new();
         public ReactiveCommandSlim ClosedCommand { get; } = new();
+        public ReactiveCommandSlim UpdateProcessesCommand { get; } = new();
 
         public ScreenShotDialogViewModel(MainWorkbenchViewModel imageContainerVM)
         {
@@ -70,6 +71,10 @@ namespace ShadowEye.ViewModel
             CancelCommand.Subscribe(() =>
             {
                 Dialog.DialogResult = false;
+            }).AddTo(_disposables);
+            UpdateProcessesCommand.Subscribe(o =>
+            {
+                UpdateProcesses();
             }).AddTo(_disposables);
             SelectScreenCommand.Subscribe(e =>
             {
@@ -140,7 +145,6 @@ namespace ShadowEye.ViewModel
 
             MainWorkbenchVM.Value = imageContainerVM;
             Source.Value = new ScreenShotSource("ScreenShot");
-            UpdateProcesses();
             Initialize(); 
             Source.Value.UpdateImage();
         }
@@ -239,6 +243,7 @@ namespace ShadowEye.ViewModel
 
             Source.Value.HowToUpdate.Request();
         }
+
         public void UpdateProcesses()
         {
             Processes.Clear();
@@ -255,7 +260,6 @@ namespace ShadowEye.ViewModel
                 return;
             WindowInfos.Clear();
             var wis = ScreenShotWindow.EnumWindows(SelectedProcess.Value.Process);
-            //wis.ToList().ForEach(x => WindowInfos.Add(x));
             WindowInfos.AddRange(wis);
         }
 
