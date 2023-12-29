@@ -65,7 +65,7 @@ namespace ShadowEye.Model
         public override void Activate()
         {
             IsRunning.Value = true;
-            Observable.Interval(TimeSpan.FromSeconds(1.0 / 60.0))
+            Observable.Interval(TimeSpan.FromMilliseconds(1000.0 / 60.0))
                 .Subscribe(_ =>
                 {
                     if (IsRunning.Value) UpdateImage();
