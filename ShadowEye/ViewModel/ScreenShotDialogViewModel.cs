@@ -13,6 +13,7 @@ using System.Reactive.Linq;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace ShadowEye.ViewModel
 {
@@ -37,6 +38,10 @@ namespace ShadowEye.ViewModel
         public ReactivePropertySlim<PictureOrMovie> CapturingType { get; } = new();
         public ScreenOption[] Monitors => ScreenOption.CreateArray();
         public ReactivePropertySlim<Screen> SelectedScreen { get; } = new();
+        public ScreenOption SelectedMonitor
+        {
+            set => SelectedScreen.Value = value?.Target;
+        }
         public ReactiveCollection<ProcessItem> Processes { get; } = [];
         public ReactivePropertySlim<ProcessItem> SelectedProcess { get; } = new();
         public ReactiveCollection<ProcessItem.WindowInfo> WindowInfos { get; } = [];
@@ -57,6 +62,7 @@ namespace ShadowEye.ViewModel
             LoadedCommand.Subscribe(() =>
             {
                 Initialize();
+                Source.Value.UpdateImage();
                 Source.Value.HowToUpdate.Request();
             }).AddTo(_disposables);
             ClosedCommand.Subscribe(() =>
@@ -76,11 +82,18 @@ namespace ShadowEye.ViewModel
             {
                 UpdateProcesses();
             }).AddTo(_disposables);
+            SelectedProcess.Subscribe(pi =>
+            {
+                SelectProcessCommand.Execute(null);
+            }).AddTo(_disposables);
+            SelectedWindowInfo.Subscribe(swi =>
+            {
+                SelectWindowCommand.Execute(null);
+            }).AddTo(_disposables);
             SelectScreenCommand.Subscribe(e =>
             {
                 if (Source.Value.Area is ScreenShotScreen screen)
                 {
-                    SelectedScreen.Value = (e.AddedItems.Cast<Screen>().Except(e.RemovedItems.Cast<Screen>()) as ScreenOption)?.Target;
                     screen.SelectedScreen = SelectedScreen.Value;
                     if (Source.Value.HowToUpdate is StaticUpdater)
                     {
@@ -145,13 +158,32 @@ namespace ShadowEye.ViewModel
 
             MainWorkbenchVM.Value = imageContainerVM;
             Source.Value = new ScreenShotSource("ScreenShot");
-            Initialize(); 
-            Source.Value.UpdateImage();
         }
 
         public void Initialize()
         {
             Target.Value = _DefaultTarget != ScreenShotTarget.Unknown ? _DefaultTarget : ScreenShotTarget.VirtualScreen; //初期状態はVirtualScreen選択
+
+            Source.Value.HowToUpdate.RequestAccomplished();
+
+            if (_ScreenShotSourceArea is not null)
+            {
+                Source.Value.Area = _ScreenShotSourceArea;
+            }
+            else
+            {
+                Source.Value.Area = Target.Value switch
+                {
+                    ScreenShotTarget.VirtualScreen => new ScreenShotVirtualScreen(),
+                    ScreenShotTarget.Screen => new ScreenShotScreen(),
+                    ScreenShotTarget.Desktop => new ScreenShotDesktop(),
+                    ScreenShotTarget.Window => new ScreenShotWindow(),
+                    _ => Source.Value.Area
+                };
+            }
+
+            Source.Value.HowToUpdate.Request();
+
             CapturingType.Value = _DefaultCapturingType != PictureOrMovie.Unknown ? _DefaultCapturingType : PictureOrMovie.Picture; //初期状態はPicture選択
             if (_DefaultSelectedScreen is not null)
             {
@@ -167,32 +199,7 @@ namespace ShadowEye.ViewModel
                 SelectedWindowInfo.Value = _DefaultSelectedWindowInfo;
             }
 
-            Source.Value.HowToUpdate.RequestAccomplished();
-
-            if (_ScreenShotSourceArea is not null)
-            {
-                Source.Value.Area = _ScreenShotSourceArea;
-            }
-            else
-            {
-                switch (Target.Value)
-                {
-                    case ScreenShotTarget.VirtualScreen:
-                        Source.Value.Area = new ScreenShotVirtualScreen();
-                        break;
-                    case ScreenShotTarget.Screen:
-                        Source.Value.Area = new ScreenShotScreen();
-                        break;
-                    case ScreenShotTarget.Desktop:
-                        Source.Value.Area = new ScreenShotDesktop();
-                        break;
-                    case ScreenShotTarget.Window:
-                        Source.Value.Area = new ScreenShotWindow();
-                        break;
-                }
-            }
-
-            Source.Value.HowToUpdate.Request();
+            OnlyClientArea.Value = _DefaultOnlyClientArea;
         }
 
         private void SwitchCapturingType()
@@ -238,6 +245,7 @@ namespace ShadowEye.ViewModel
                     break;
                 case ScreenShotTarget.Window:
                     Source.Value.Area = new ScreenShotWindow(SelectedProcess.Value?.Process);
+                    UpdateProcesses();
                     break;
             }
 
@@ -265,7 +273,7 @@ namespace ShadowEye.ViewModel
 
         public void SelectWindowHandle()
         {
-            if (SelectedProcess == null)
+            if (SelectedProcess.Value is null)
                 return;
             SelectedWindowInfo.Value = WindowInfos.SingleOrDefault(a => a.WindowHandle.Equals(SelectedProcess.Value.Process.MainWindowHandle));
         }
@@ -287,6 +295,7 @@ namespace ShadowEye.ViewModel
             _DefaultSelectedScreen = SelectedScreen.Value;
             _DefaultSelectedProcess = SelectedProcess.Value;
             _DefaultSelectedWindowInfo = SelectedWindowInfo.Value;
+            _DefaultOnlyClientArea = OnlyClientArea.Value;
             _ScreenShotSourceArea = Source.Value.Area;
         }
 

@@ -5,6 +5,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -217,13 +218,13 @@ namespace libimgengCore
             int height = hsv.Height;
 
             byte[] values = new byte[hsv.Width * hsv.Height];
-            for (int y = 0; y < height; ++y)
+            Parallel.For(0, height, y =>
             {
                 for (int x = 0; x < width; ++x)
                 {
                     values[y * width + x] = (*(p + y * step + x * channels + channel));
                 }
-            }
+            });
 
             return values;
         }
@@ -248,7 +249,7 @@ namespace libimgengCore
                 int height = bitmap.PixelHeight;
                 int width = bitmap.PixelWidth;
                 int backbufferStride = bitmap.BackBufferStride;
-                for (int x = 0; x < width; ++x)
+                Parallel.For(0, width, x =>
                 {
                     int count = histogram[x];
                     for (int y = 0; y < height; ++y)
@@ -266,7 +267,7 @@ namespace libimgengCore
                             *(p + x * 3 + (height - y) * backbufferStride + 2) = 0;
                         }
                     }
-                }
+                });
 
                 bitmap.AddDirtyRect(new Int32Rect(0, 0, width, height));
             }
@@ -286,7 +287,7 @@ namespace libimgengCore
                 int height = bitmap.PixelHeight;
                 int width = bitmap.PixelWidth;
                 int backbufferStride = bitmap.BackBufferStride;
-                for (int x = 0; x < width; ++x)
+                Parallel.For(0, width, x =>
                 {
                     int count = histogram[x];
                     double log10_count = Math.Log10(count);
@@ -306,7 +307,7 @@ namespace libimgengCore
                             *(p + x * 3 + (height - y) * backbufferStride + 2) = 0;
                         }
                     }
-                }
+                });
 
                 bitmap.AddDirtyRect(new Int32Rect(0, 0, width, height));
             }
@@ -325,7 +326,7 @@ namespace libimgengCore
             int cols = mat.Cols;
             long step = mat.Step();
             int channels = mat.Channels();
-            for (int y = 0; y < rows; ++y)
+            Parallel.For(0, rows, y =>
             {
                 int ar_y = y * cols;
                 long mat_y = y * step;
@@ -334,7 +335,7 @@ namespace libimgengCore
                     byte value = *(p + mat_y + x * channels + channel);
                     histogram[value] = histogram[value] + 1;
                 }
-            }
+            });
 
             return histogram;
         }

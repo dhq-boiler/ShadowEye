@@ -28,7 +28,7 @@ namespace ShadowEye.View.Controls.Converter
                 case "Desktop":
                     return val == ScreenShotDialogViewModel.ScreenShotTarget.Desktop;
                 case "Window":
-                    return val = ScreenShotDialogViewModel.ScreenShotTarget.Window;
+                    return val == ScreenShotDialogViewModel.ScreenShotTarget.Window;
                 default:
                     Debug.Assert(false, string.Format("value is {{{0}}}, parameter is {{{1}}}", value, parameter));
                     break;

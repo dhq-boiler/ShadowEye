@@ -84,7 +84,14 @@
                         <ComboBox
                             x:Name="ComboBox_SelectScreen"
                             IsEnabled="{Binding Header.IsChecked, RelativeSource={RelativeSource AncestorType=GroupBox, AncestorLevel=1}}"
-                            ItemsSource="{Binding Monitors}" />
+                            ItemsSource="{Binding Monitors}"
+                            SelectedItem="{Binding SelectedMonitor, Mode=OneWayToSource}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="SelectionChanged">
+                                    <i:InvokeCommandAction Command="{Binding SelectScreenCommand}" PassEventArgsToCommand="True" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </ComboBox>
                     </DockPanel>
                 </GroupBox>
                 <RadioButton

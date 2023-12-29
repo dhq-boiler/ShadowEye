@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
 namespace ShadowEye.Model
@@ -86,23 +87,24 @@ namespace ShadowEye.Model
             if (App.Current is null)
                 return;
 
-            App.Current.Dispatcher.Invoke(() =>
+            try
             {
-                lock (mat)
+                App.Current.Dispatcher.Invoke(() =>
                 {
-                    if (mat.IsDisposed)
-                        return;
-
-                    try
+                    lock (mat)
                     {
+                        if (mat.IsDisposed)
+                            return;
+
                         Bitmap.Value = mat.ToWriteableBitmap();
                     }
-                    catch (ArgumentException)
-                    {
-                        Bitmap.Value = WriteableBitmapConverter.ToWriteableBitmap(mat);
-                    }
-                }
-            });
+                });
+            }
+            catch (TaskCanceledException e)
+            {
+                //ˆ¬‚è’×‚µ
+                return;
+            }
         }
 
         public ReactivePropertySlim<WriteableBitmap> Bitmap { get; } = new();

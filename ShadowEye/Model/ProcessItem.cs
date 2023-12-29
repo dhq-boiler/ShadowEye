@@ -14,7 +14,7 @@ namespace ShadowEye.Model
     {
         private List<WindowInfo> _WindowInfos = new List<WindowInfo>();
 
-        public Process Process { get; set; }
+        public Process Process { get; }
 
         public ProcessItem(Process p)
         {
@@ -71,6 +71,16 @@ namespace ShadowEye.Model
             }
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is ProcessItem pi && pi.Process.Id.Equals(Process.Id);
+        }
+
+        public override int GetHashCode()
+        {
+            return Process is not null ? Process.Id.GetHashCode() : 0;
+        }
+
         public class WindowInfo
         {
             public string WindowTitle { get; set; }
@@ -93,6 +103,16 @@ namespace ShadowEye.Model
             public override string ToString()
             {
                 return WindowTitle;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is WindowInfo winfo && winfo.WindowHandle.Equals(WindowHandle);
+            }
+
+            public override int GetHashCode()
+            {
+                return WindowHandle.ToInt64().GetHashCode();
             }
         }
     }
