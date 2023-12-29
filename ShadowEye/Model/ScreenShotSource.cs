@@ -1,14 +1,13 @@
 using OpenCvSharp.Extensions;
 using OpenCvSharp.WpfExtensions;
+using Reactive.Bindings;
+using Reactive.Bindings.Disposables;
+using Reactive.Bindings.Extensions;
 using ShadowEye.Utils;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Reactive.Linq;
-using System.Windows.Threading;
-using Reactive.Bindings;
-using Reactive.Bindings.Disposables;
-using Reactive.Bindings.Extensions;
 
 namespace ShadowEye.Model
 {
