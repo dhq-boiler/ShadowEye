@@ -78,10 +78,10 @@ namespace ShadowEye.ViewModel
             }).AddTo(_disposables);
             SelectScreenCommand.Subscribe(e =>
             {
-                if (Source.Value.Area is ScreenShotScreen)
+                if (Source.Value.Area is ScreenShotScreen screen)
                 {
                     SelectedScreen.Value = (e.AddedItems.Cast<Screen>().Except(e.RemovedItems.Cast<Screen>()) as ScreenOption)?.Target;
-                    (Source.Value.Area as ScreenShotScreen).SelectedScreen = SelectedScreen.Value;
+                    screen.SelectedScreen = SelectedScreen.Value;
                     if (Source.Value.HowToUpdate is StaticUpdater)
                     {
                         Source.Value.UpdateImage();
