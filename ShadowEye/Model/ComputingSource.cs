@@ -110,14 +110,29 @@ namespace ShadowEye.Model
             {
                 try
                 {
-                    lock (LeftHand.Mat.Value) lock (RightHand.Mat.Value)
+                    lock (LeftHand.Mat.Value)
                     {
-                        if (LeftHand.Mat.Value is null || LeftHand.Mat.Value.IsDisposed 
-                         || RightHand.Mat.Value is null || RightHand.Mat.Value.IsDisposed)
+                        if (LeftHand.Mat.Value is null || LeftHand.Mat.Value.IsDisposed)
                         {
                             return;
                         }
-                        Compute();
+
+                        if (RightHand?.Mat?.Value is not null)
+                        {
+                            if (RightHand.Mat.Value is null || RightHand.Mat.Value.IsDisposed)
+                            {
+                                return;
+                            }
+
+                            lock (RightHand.Mat.Value)
+                            {
+                                Compute();
+                            }
+                        }
+                        else
+                        {
+                            Compute();
+                        }
                     }
 
                     lock (Mat.Value)
