@@ -47,7 +47,7 @@
                                MaxHeight="200"
                                MinWidth="100"
                                MinHeight="100"
-                               Source="{Binding ElementName=ComboBox_Target, Path=SelectedItem.Content.Bitmap}" />
+                               Source="{Binding ElementName=ComboBox_Target, Path=SelectedItem.Content.Bitmap.Value}" />
                     </DockPanel>
                 </GroupBox>
                 <GroupBox Grid.Row="1"

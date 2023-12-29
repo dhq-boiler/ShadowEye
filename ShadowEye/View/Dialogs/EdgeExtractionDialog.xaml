@@ -113,7 +113,7 @@
                               DockPanel.Dock="Top"
                               ItemsSource="{Binding Items}"
                               SelectionChanged="ComboBox_Target_SelectionChanged" />
-                    <Image Source="{Binding SelectedItem.Content.Bitmap, ElementName=ComboBox_Target}" />
+                    <Image Source="{Binding SelectedItem.Content.Bitmap.Value, ElementName=ComboBox_Target}" />
                 </DockPanel>
             </GroupBox>
         </DockPanel>
