@@ -1,23 +1,18 @@
 
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reactive.Disposables;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using Microsoft.Win32;
 using OpenCvSharp;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using ShadowEye.Model;
-using ShadowEye.Utils;
 using ShadowEye.View;
 using ShadowEye.View.Dialogs;
+using System;
+using System.IO;
+using System.Reactive.Disposables;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Windows;
 
 namespace ShadowEye.ViewModel
 {
@@ -43,19 +38,16 @@ namespace ShadowEye.ViewModel
 
         private void SetMainWindowTitle()
         {
-            var version = Assembly.GetExecutingAssembly().GetName().Version;
-            if (version.Build != 0)
+#pragma warning disable CS0162, IDE0035
+            if (ThisAssembly.Git.Branch == "master" || ThisAssembly.Git.Branch == "main")
             {
-                MainWindow.Title = string.Format("ShadowEye {0}.{1}.{2}", version.Major, version.Minor, version.Build);
+                MainWindow.Title = $"ShadowEye {ThisAssembly.Git.BaseTag}";
             }
-            else if (version.Minor != 0)
+            if (ThisAssembly.Git.Branch == "develop")
             {
-                MainWindow.Title = string.Format("ShadowEye {0}.{1}", version.Major, version.Minor);
+                MainWindow.Title = $"ShadowEye {ThisAssembly.Git.Tag}";
             }
-            else
-            {
-                MainWindow.Title = string.Format("ShadowEye {0}", version.Major);
-            }
+#pragma warning restore CS0162, IDE0035
         }
 
         private void RegisterCommands()
