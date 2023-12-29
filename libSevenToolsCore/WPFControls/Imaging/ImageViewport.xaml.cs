@@ -1,10 +1,9 @@
-﻿// Copyright © 2015 dhq_boiler.
+﻿// Copyright © 2015-2023 dhq_boiler.
 
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -996,11 +995,6 @@ namespace libSevenToolsCore.WPFControls.Imaging
 
         private unsafe void RenderAtDifferentScale(WriteableBitmap bitmap, byte* p_s, byte* p_d, Color renderingBackground, Interpolation method, Rect renderedRenderingAreaRect)
         {
-            int RenderingArea_BeginRenderingTop = (int)renderedRenderingAreaRect.Top;
-            int RenderingArea_BeginRenderingLeft = (int)renderedRenderingAreaRect.Left;
-            int RenderingArea_EndRenderingBottom = (int)renderedRenderingAreaRect.Bottom;
-            int RenderingArea_EndRenderingRight = (int)renderedRenderingAreaRect.Right;
-
             int width_s = Source.PixelWidth;
             int height_s = Source.PixelHeight;
             int step_s = Source.BackBufferStride;
@@ -1008,94 +1002,49 @@ namespace libSevenToolsCore.WPFControls.Imaging
             int width_d = bitmap.PixelWidth;
             int height_d = bitmap.PixelHeight;
             int step_d = bitmap.BackBufferStride;
-            int offsetX = OffsetX;
-            int offsetY = OffsetY;
 
             double patternWidth = (double)RenderingSizePerPixel;
             double patternHeight = (double)RenderingSizePerPixel;
             int pixelBorderThickness = (int)PixelBorderThickness;
-            int renderingSizePerPixel = (int)RenderingSizePerPixel;
             int sourceLeft = (int)-OffsetX;
             int sourceTop = (int)-OffsetY;
-            Color pixelBorderColor = PixelBorderColor;
 
-            int x_begin = 0;
-            int x_end = ScaledSourceWidth;
-            int y_begin = 0;
-            int y_end = ScaledSourceHeight;
+            int w1 = width_s;
+            int h1 = height_s;
+            int w2 = ScaledSourceWidth;
+            int h2 = ScaledSourceHeight;
 
-            int rx1 = 0;
-            int ry1 = 0;
-            int rx2 = width_s;
-            int ry2 = height_s;
-
-            int w1 = rx2 - rx1;
-            int h1 = ry2 - ry1;
-            int w2 = x_end - x_begin;
-            int h2 = y_end - y_begin;
+            int offsetX = Dispatcher.Invoke(() => OffsetX);
+            int offsetY = Dispatcher.Invoke(() => OffsetY);
 
             Parallel.For(0, height_d, (y) =>
             {
-                if (RenderingArea_BeginRenderingTop <= y && y < RenderingArea_EndRenderingBottom)
+                int py = (int)((y - sourceTop) % patternHeight);
+                double fy = (double)(y - py + offsetY) * h1 / h2;
+                int indexY = (int)((offsetY + y) / patternHeight);
+
+                bool drawBorderY = pixelBorderThickness > 0 && ((indexY == 0 && py == 0) || py >= patternHeight - pixelBorderThickness);
+
+                for (int x = 0; x < width_d; ++x)
                 {
-                    int py = (int)((y - sourceTop) % patternHeight);
-                    double fy = (double)(y - py - y_begin + offsetY) * h1 / (double)h2 + ry1;
-                    int indexY = (int)((offsetY + y) / patternHeight);
+                    int px = (int)((x - sourceLeft) % patternWidth);
+                    double fx = (double)(x - px + offsetX) * w1 / w2;
+                    int indexX = (int)((offsetX + x) / patternWidth);
 
-                    if (pixelBorderThickness > 0 && ((indexY == 0 && py == 0) || py >= renderingSizePerPixel - pixelBorderThickness)) //Y境界線上または最上行の上端
+                    bool drawBorderX = pixelBorderThickness > 0 && ((indexX == 0 && px == 0) || px >= patternWidth - pixelBorderThickness);
+
+                    if (drawBorderY || drawBorderX)
                     {
-                        for (int x = 0; x < width_d; ++x)
-                        {
-                            if (RenderingArea_BeginRenderingLeft <= 0 && x < RenderingArea_EndRenderingRight)
-                            {
-                                int px = (int)((x - sourceLeft) % patternWidth);
-                                int indexX = (int)((offsetX + x) / patternWidth);
-                                double fx = (double)(x - px - x_begin + offsetX) * w1 / (double)w2 + rx1;
-
-                                //描画
-                                DrawPixelBorderByAverage(p_s, width_s, height_s, step_s, channels, p_d, step_d, method, pixelBorderColor, y, fy, x, fx);
-                            }
-                            else
-                            {
-                                DrawBackgroundPixel(renderingBackground, channels, p_d, step_d, y, x);
-                            }
-                        }
+                        DrawPixelBorderByAverage(p_s, width_s, height_s, step_s, channels, p_d, step_d, method, PixelBorderColor, y, fy, x, fx);
                     }
-                    else //Y画素内
+                    else
                     {
-                        for (int x = 0; x < width_d; ++x)
-                        {
-                            if (RenderingArea_BeginRenderingLeft <= x && x < RenderingArea_EndRenderingRight)
-                            {
-                                int px = (int)((x - sourceLeft) % patternWidth);
-                                int indexX = (int)((offsetX + x) / patternWidth);
-                                double fx = (double)(x - px - x_begin + offsetX) * w1 / (double)w2 + rx1;
-
-                                if (pixelBorderThickness > 0 && ((indexX == 0 && px == 0) || px >= renderingSizePerPixel - pixelBorderThickness)) //X境界線上または最左列の左端
-                                {
-                                    DrawPixelBorderByAverage(p_s, width_s, height_s, step_s, channels, p_d, step_d, method, pixelBorderColor, y, fy, x, fx);
-                                }
-                                else //X画素内
-                                {
-                                    DrawForegroundPixel(renderingBackground, p_s, width_s, height_s, step_s, channels, p_d, step_d, method, y, fy, x, fx);
-                                }
-                            }
-                            else //X画像範囲外
-                            {
-                                DrawBackgroundPixel(renderingBackground, channels, p_d, step_d, y, x);
-                            }
-                        }
-                    }
-                }
-                else //Y画像範囲外
-                {
-                    for (int x = 0; x < width_d; ++x)
-                    {
-                        DrawBackgroundPixel(renderingBackground, channels, p_d, step_d, y, x);
+                        DrawForegroundPixel(renderingBackground, p_s, width_s, height_s, step_s, channels, p_d, step_d, method, y, fy, x, fx);
                     }
                 }
             });
         }
+
 
         private WriteableBitmap PrepareBitmap()
         {
@@ -1201,7 +1150,7 @@ namespace libSevenToolsCore.WPFControls.Imaging
             return Source == null || RenderingAreaWidth < 1.0 || RenderingAreaHeight < 1.0 || _LockRenderingCount > 0;
         }
 
-        unsafe private static void DrawForegroundPixel(Color background, byte* p_s, int width_s, int height_s, int step_s, int channels, byte* p_d, int step_d, Interpolation method, int y, double fy, int x, double fx)
+        private static unsafe void DrawForegroundPixel(Color background, byte* p_s, int width_s, int height_s, int step_s, int channels, byte* p_d, int step_d, Interpolation method, int y, double fy, int x, double fx)
         {
             int p0 = 0, p1 = 0, p2 = 0, p3 = 0;
             bool success = false;
@@ -1252,7 +1201,7 @@ namespace libSevenToolsCore.WPFControls.Imaging
         }
 
 
-        unsafe private static void DrawBackgroundPixel(Color background, int channels, byte* p_d, int step_d, int y, int x)
+        private static unsafe void DrawBackgroundPixel(Color background, int channels, byte* p_d, int step_d, int y, int x)
         {
             if (channels == 4)
             {
@@ -1268,7 +1217,7 @@ namespace libSevenToolsCore.WPFControls.Imaging
             }
         }
 
-        unsafe private static void DrawBackgroundPixelBGR(Color background, byte* p_d, int step_d, int y, int x)
+        private static unsafe void DrawBackgroundPixelBGR(Color background, byte* p_d, int step_d, int y, int x)
         {
             *(p_d + y * step_d + x * 3 + 0) = background.B;
             *(p_d + y * step_d + x * 3 + 1) = background.G;
@@ -1313,7 +1262,7 @@ namespace libSevenToolsCore.WPFControls.Imaging
             }
         }
 
-        unsafe private static void DrawBackgroundPixelBGRWithAlpha(Color renderingBackground, byte* p_d, int step_d, int y, int x)
+        private static unsafe void DrawBackgroundPixelBGRWithAlpha(Color renderingBackground, byte* p_d, int step_d, int y, int x)
         {
             *(p_d + y * step_d + x * 4 + 0) = renderingBackground.B;
             *(p_d + y * step_d + x * 4 + 1) = renderingBackground.G;
@@ -1321,7 +1270,7 @@ namespace libSevenToolsCore.WPFControls.Imaging
             *(p_d + y * step_d + x * 4 + 3) = renderingBackground.A;
         }
 
-        unsafe private static void DrawPixelBorderByAverage(byte* p_s, int width_s, int height_s, int step_s, int channels, byte* p_d, int step_d, Interpolation method, Color pixelBorderColor, int y, double fy, int x, double fx)
+        private static unsafe void DrawPixelBorderByAverage(byte* p_s, int width_s, int height_s, int step_s, int channels, byte* p_d, int step_d, Interpolation method, Color pixelBorderColor, int y, double fy, int x, double fx)
         {
             if (channels == 4)
             {
