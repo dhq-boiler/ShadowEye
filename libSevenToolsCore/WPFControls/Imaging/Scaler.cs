@@ -7,7 +7,7 @@ namespace libSevenToolsCore.WPFControls.Imaging
 {
     internal static class Scaler
     {
-        internal unsafe static bool Interplate(Interpolation method, byte* p_s,
+        internal unsafe static bool Interpolate(Interpolation method, byte* p_s,
             double x, double y,
             int min_x, int max_x,
             int min_y, int max_y,
@@ -23,7 +23,7 @@ namespace libSevenToolsCore.WPFControls.Imaging
             };
         }
 
-        internal unsafe static bool Interplate(Interpolation method, byte* p_s,
+        internal unsafe static bool Interpolate(Interpolation method, byte* p_s,
             double x, double y,
             int min_x, int max_x,
             int min_y, int max_y,
@@ -39,7 +39,7 @@ namespace libSevenToolsCore.WPFControls.Imaging
             };
         }
 
-        internal unsafe static bool Interplate(Interpolation method, byte* p_s,
+        internal unsafe static bool Interpolate(Interpolation method, byte* p_s,
             double x, double y,
             int min_x, int max_x,
             int min_y, int max_y,
