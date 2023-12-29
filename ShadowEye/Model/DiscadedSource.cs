@@ -31,7 +31,7 @@ namespace ShadowEye.Model
         public void Store(Mat storing)
         {
             Debug.Assert(storing != null && !storing.IsDisposed);
-            this.Mat = storing;
+            this.Mat.Value = storing;
             UpdateImage();
         }
 
@@ -41,7 +41,7 @@ namespace ShadowEye.Model
             {
                 if (IsShowingCurrentTab() || HowToUpdate.InUse)
                 {
-                    SetBitmapFromMat(this.Mat);
+                    SetBitmapFromMat(this.Mat.Value);
                     OnSourceUpdated(this, new EventArgs());
                 }
             }

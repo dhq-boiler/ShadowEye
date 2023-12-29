@@ -12,7 +12,7 @@ namespace ShadowEye.Model
         public ChannelExtractedSource(string name, AnalyzingSource target, int Channel)
             : base(name)
         {
-            Debug.Assert(Channel >= 0 && Channel < target.Mat.Type().Channels);
+            Debug.Assert(Channel >= 0 && Channel < target.Mat.Value.Type().Channels);
 
             this.HowToUpdate = target.HowToUpdate.SameUpdater(this);
 
@@ -27,8 +27,8 @@ namespace ShadowEye.Model
 
         public override void Compute()
         {
-            var split = Cv2.Split(LeftHand.Mat);
-            Mat = split[_Channel].Clone();
+            var split = Cv2.Split(LeftHand.Mat.Value);
+            Mat.Value = split[_Channel].Clone();
         }
 
         public override bool Equals(object obj)

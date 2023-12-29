@@ -81,7 +81,7 @@ namespace ShadowEye.ViewModel
                     SelectedLeftHand, SelectedRightHand,
                     IsAbsolute ? ComputingMethod.Subtract_Absolute : ComputingMethod.Subtract,
                     ColorMode);
-                (App.Current.MainWindow as MainWindow).MainWindowVM.ImageContainerVM.AddOrActive(source);
+                MainWindow.MainWindowVM.ImageContainerVM.AddOrActive(source);
             }
             catch (OpenCvSharp.OpenCVException e)
             {

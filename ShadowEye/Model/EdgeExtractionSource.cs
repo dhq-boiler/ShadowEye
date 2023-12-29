@@ -48,12 +48,12 @@ namespace ShadowEye.Model
         {
             try
             {
-                using (Mat newMat = new Mat(LeftHand.Mat.Rows, LeftHand.Mat.Cols, _ddepth))
+                using (Mat newMat = new Mat(LeftHand.Mat.Value.Rows, LeftHand.Mat.Value.Cols, _ddepth))
                 {
                     switch (Method)
                     {
                         case ComputingMethod.EdgeExtraction_Sobel:
-                            Cv2.Sobel(LeftHand.Mat, newMat, _ddepth, _xorder, _yorder, _ksize, _scale, _delta, _borderType);
+                            Cv2.Sobel(LeftHand.Mat.Value, newMat, _ddepth, _xorder, _yorder, _ksize, _scale, _delta, _borderType);
                             break;
                         case ComputingMethod.EdgeExtraction_Canny:
                             break;
@@ -62,7 +62,7 @@ namespace ShadowEye.Model
                         default:
                             throw new InvalidOperationException("Unknown computing method.");
                     }
-                    Mat = newMat.Clone();
+                    Mat.Value = newMat.Clone();
                 }
             }
             catch (OpenCVException e)

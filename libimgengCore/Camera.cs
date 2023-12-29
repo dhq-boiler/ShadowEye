@@ -1,7 +1,6 @@
 
 
 using OpenCvSharp;
-using OpenCvSharp.WpfExtensions;
 using System;
 using System.Windows.Media.Imaging;
 

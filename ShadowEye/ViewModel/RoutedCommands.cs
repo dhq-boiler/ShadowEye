@@ -17,6 +17,7 @@ namespace ShadowEye.ViewModel
         #region タブメニュー
 
         public static readonly RoutedCommand StoreDiscadedImageCommand = new RoutedCommand();
+        public static readonly RoutedCommand CopyImageToClipboardCommand = new RoutedCommand();
         public static readonly RoutedCommand SaveAsCommand = new RoutedCommand();
         public static readonly RoutedCommand CloseThisTabCommand = new RoutedCommand();
 

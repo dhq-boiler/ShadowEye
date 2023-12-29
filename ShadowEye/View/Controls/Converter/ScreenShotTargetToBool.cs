@@ -6,7 +6,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
+using System.Windows.Markup;
 using ShadowEye.ViewModel;
 
 namespace ShadowEye.View.Controls.Converter
@@ -26,7 +28,7 @@ namespace ShadowEye.View.Controls.Converter
                 case "Desktop":
                     return val == ScreenShotDialogViewModel.ScreenShotTarget.Desktop;
                 case "Window":
-                    return val = ScreenShotDialogViewModel.ScreenShotTarget.Window;
+                    return val == ScreenShotDialogViewModel.ScreenShotTarget.Window;
                 default:
                     Debug.Assert(false, string.Format("value is {{{0}}}, parameter is {{{1}}}", value, parameter));
                     break;
@@ -41,19 +43,17 @@ namespace ShadowEye.View.Controls.Converter
             var str = (string)parameter;
             switch (str)
             {
-                case "VirtualScreen":
+                case "VirtualScreen" when b:
                     return ScreenShotDialogViewModel.ScreenShotTarget.VirtualScreen;
-                case "Screen":
+                case "Screen" when b:
                     return ScreenShotDialogViewModel.ScreenShotTarget.Screen;
-                case "Desktop":
+                case "Desktop" when b:
                     return ScreenShotDialogViewModel.ScreenShotTarget.Desktop;
-                case "Window":
+                case "Window" when b:
                     return ScreenShotDialogViewModel.ScreenShotTarget.Window;
-                default:
-                    Debug.Assert(false, string.Format("value is {{{0}}}, parameter is {{{1}}}", value, parameter));
-                    break;
             }
-            throw new ArgumentException(string.Format("value is {{{0}}}, parameter is {{{1}}}", value, parameter));
+
+            return DependencyProperty.UnsetValue;
         }
     }
 }

@@ -33,10 +33,10 @@ namespace ShadowEye.Model
             switch (Method)
             {
                 case ComputingMethod.IntegrateChannel:
-                    Mat = IntegrateChannels(LeftHand.Mat, false);
+                    Mat.Value = IntegrateChannels(LeftHand.Mat.Value, false);
                     return;
                 case ComputingMethod.IntegrateChannel_Normalize:
-                    Mat = IntegrateChannels(LeftHand.Mat, true);
+                    Mat.Value = IntegrateChannels(LeftHand.Mat.Value, true);
                     return;
                 default:
                     throw new InvalidOperationException("Unknown computing method.");

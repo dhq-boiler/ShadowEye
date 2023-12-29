@@ -44,8 +44,8 @@ namespace ShadowEye.Model
             {
                 if (Frames.Count() - 1 >= CurrentIndex.Value)
                 {
-                    Mat = Frames[CurrentIndex.Value].Item1;
-                    SetBitmapFromMat(Mat);
+                    Mat.Value = Frames[CurrentIndex.Value].Item1;
+                    SetBitmapFromMat(Mat.Value);
                     OnSourceUpdated(this, new EventArgs());
                 }
             })
@@ -89,8 +89,8 @@ namespace ShadowEye.Model
             {
                 if (Frames.Count() - 1 >= CurrentIndex.Value)
                 {
-                    Mat = Frames[CurrentIndex.Value].Item1;
-                    SetBitmapFromMat(Mat);
+                    Mat.Value = Frames[CurrentIndex.Value].Item1;
+                    SetBitmapFromMat(Mat.Value);
                     OnSourceUpdated(this, new EventArgs());
                 }
             })
@@ -161,9 +161,9 @@ namespace ShadowEye.Model
             try
             {
                 TargetSource.Value.UpdateImage();
-                Mat = TargetSource.Value.Mat.Clone();
+                Mat.Value = TargetSource.Value.Mat.Value.Clone();
                 OnSourceUpdated(this, new EventArgs());
-                Frames.Add(new Tuple<Mat, TimeSpan>(Mat, DateTime.Now - _previousRecordDateTime));
+                Frames.Add(new Tuple<Mat, TimeSpan>(Mat.Value, DateTime.Now - _previousRecordDateTime));
                 _previousRecordDateTime = DateTime.Now;
                 CurrentIndex.Value++;
                 if (HowToUpdate is StaticUpdater

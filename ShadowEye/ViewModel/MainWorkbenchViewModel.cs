@@ -10,7 +10,10 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Windows;
 using System.Windows.Media.Imaging;
+using Size = OpenCvSharp.Size;
 
 namespace ShadowEye.ViewModel
 {
@@ -19,6 +22,8 @@ namespace ShadowEye.ViewModel
         private int _selectedIndex;
         private Dictionary<string, AnalyzingSource> _tab_collection;
         private ImageViewModel _selectedImageVM;
+        private static string _previousSaveDir;
+        private static string _previousSaveExtension;
         public MainWindowViewModel MainWindowVM { get; private set; }
 
         public MainWorkbenchViewModel(MainWindowViewModel mainwindowVM)
@@ -31,6 +36,10 @@ namespace ShadowEye.ViewModel
 
         private void RegisterCommands()
         {
+            base.RegisterCommand(RoutedCommands.CopyImageToClipboardCommand, (object p) => true, (object p) =>
+            {
+                this.CopyImageToClipboard(p as ImageViewModel);
+            });
             base.RegisterCommand(RoutedCommands.SaveAsCommand, (object p) => true, (object p) =>
             {
                 this.SaveAsDialogOpen(p as ImageViewModel);
@@ -47,11 +56,19 @@ namespace ShadowEye.ViewModel
             });
         }
 
+        private void CopyImageToClipboard(ImageViewModel imageViewModel)
+        {
+            var source = imageViewModel.Source;
+            Clipboard.SetImage(source.Bitmap.Value);
+        }
+
         internal void SaveAsDialogOpen(AnalyzingSource source)
         {
             SaveFileDialog dialog = new SaveFileDialog();
-            dialog.FileName = source.Name;
-            dialog.DefaultExt = "jpg";
+            dialog.FileName = GetDefaultFileName(source.Name);
+            dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            dialog.DefaultExt = _previousSaveExtension;
+            dialog.AddExtension = true;
             if (source is FilmSource)
             {
                 dialog.Filter = GetExtensions(true, true);
@@ -79,7 +96,7 @@ namespace ShadowEye.ViewModel
                 else if (Path.GetExtension(dialog.FileName) == ".mp4")
                 {
                     var filmSource = source as FilmSource;
-                    using (VideoWriter videoWriter = new VideoWriter(dialog.FileName, FourCC.H264, filmSource.Frames.Count() / (filmSource.Frames.Sum(x => x.Item2.Milliseconds) / 1000d), new Size(source.Mat.Width, source.Mat.Height)))
+                    using (VideoWriter videoWriter = new VideoWriter(dialog.FileName, FourCC.H264, filmSource.Frames.Count() / (filmSource.Frames.Sum(x => x.Item2.Milliseconds) / 1000d), new Size(source.Mat.Value.Width, source.Mat.Value.Height)))
                     {
                         var list = filmSource.Frames.Skip(filmSource.SelectionStart.Value + 1);
                         foreach (var mat in list.Take(filmSource.SelectionEnd.Value - filmSource.SelectionStart.Value).Select(x => x.Item1))
@@ -90,8 +107,11 @@ namespace ShadowEye.ViewModel
                 }
                 else
                 {
-                    source.Mat.SaveImage(dialog.FileName);
+                    source.Mat.Value.SaveImage(dialog.FileName);
                 }
+
+                _previousSaveDir = Path.GetDirectoryName(dialog.FileName);
+                _previousSaveExtension = Path.GetExtension(dialog.FileName);
             }
         }
 
@@ -104,8 +124,9 @@ namespace ShadowEye.ViewModel
             }
 
             SaveFileDialog dialog = new SaveFileDialog();
-            dialog.FileName = ivm.Source.Name;
-            dialog.DefaultExt = "jpg";
+            dialog.FileName = GetDefaultFileName(ivm.Source.Name);
+            dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            dialog.DefaultExt = _previousSaveExtension;
             if (ivm.Source is FilmSource)
             {
                 dialog.Filter = GetExtensions(true, true);
@@ -133,7 +154,7 @@ namespace ShadowEye.ViewModel
                 else if (Path.GetExtension(dialog.FileName) == ".mp4")
                 {
                     var filmSource = ivm.Source as FilmSource;
-                    using (VideoWriter videoWriter = new VideoWriter(dialog.FileName, FourCC.H264, filmSource.Frames.Count() / (filmSource.Frames.Sum(x => x.Item2.Milliseconds) / 1000d), new Size(ivm.Source.Mat.Width, ivm.Source.Mat.Height)))
+                    using (VideoWriter videoWriter = new VideoWriter(dialog.FileName, FourCC.H264, filmSource.Frames.Count() / (filmSource.Frames.Sum(x => x.Item2.Milliseconds) / 1000d), new Size(ivm.Source.Mat.Value.Width, ivm.Source.Mat.Value.Height)))
                     {
                         var list = filmSource.Frames.Skip(filmSource.SelectionStart.Value + 1);
                         foreach (var mat in list.Take(filmSource.SelectionEnd.Value - filmSource.SelectionStart.Value).Select(x => x.Item1))
@@ -144,25 +165,43 @@ namespace ShadowEye.ViewModel
                 }
                 else
                 {
-                    ivm.Source.Mat.SaveImage(dialog.FileName);
+                    ivm.Source.Mat.Value.SaveImage(dialog.FileName);
                 }
+
+                _previousSaveDir = Path.GetDirectoryName(dialog.FileName);
+                _previousSaveExtension = Path.GetExtension(dialog.FileName);
             }
+        }
+
+        private string GetDefaultFileName(string name)
+        {
+            var currentDirectory = Environment.CurrentDirectory;
+            if (string.IsNullOrEmpty(_previousSaveDir))
+            {
+                _previousSaveDir = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            }
+            var regex = new Regex("(?<name>.+?)-(?<index>\\d+?)");
+            var files = Directory.EnumerateFiles(_previousSaveDir);
+            var nextIndex = files.Where(file => regex.IsMatch(file)).Select(file => int.Parse(regex.Match(file).Groups["index"].Value)).Max() + 1;
+            return $"{regex.Match(name).Groups["name"].Value}-{nextIndex}";
         }
 
         private static string GetExtensions(bool gifSupport, bool mp4Support)
         {
-            var ret = "Windows Bitmaps|*.bmp;*.dib|" +
-                      "JPEG files|*.jpg;*.jpeg;*.jpe|" +
-                      "JPEG 2000 files|*.jp2|" +
-                      "Portable Network Graphics files|*.png|" +
-                      "WebP|*.webp|" +
-                      "Sun rasters|*.sr;*.ras|" +
-                      "TIFF files|*.tiff;*.tif|" +
-                      "Radiance HDR|*.hdr;*.pic|";
-            if (gifSupport) ret += "GIF|*.gif|";
-            if (mp4Support) ret += "MP4|*.mp4|";
-            ret +=    "All Files|*.*";
-            return ret;
+            List<string> extentions = [
+                                "Windows Bitmaps|*.bmp;*.dib",
+                                "JPEG files|*.jpg;*.jpeg;*.jpe",
+                                "JPEG 2000 files|*.jp2",
+                                "Portable Network Graphics files|*.png",
+                                "WebP|*.webp",
+                                "Sun rasters|*.sr;*.ras",
+                                "TIFF files|*.tiff;*.tif",
+                                "Radiance HDR|*.hdr;*.pic"
+                ];
+            if (gifSupport) extentions.Add("GIF|*.gif");
+            if (mp4Support) extentions.Add("MP4|*.mp4");
+            extentions.Add("All Files|*.*");
+            return string.Join('|', extentions.Order());
         }
 
         public void AddOrActive(AnalyzingSource source)

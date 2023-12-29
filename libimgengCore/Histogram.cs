@@ -5,6 +5,8 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -209,21 +211,27 @@ namespace libimgengCore
 
         private unsafe static byte[] CopyOneChannelToArray(Mat hsv, int channel)
         {
+            // Debug.Assertはデバッグビルドでのみ有効に
+#if DEBUG
             Debug.Assert(hsv != null, "hsv != null");
+#endif
+
             byte* p = (byte*)hsv.Data.ToPointer();
             long step = hsv.Step();
             int channels = hsv.Channels();
             int width = hsv.Width;
             int height = hsv.Height;
 
-            byte[] values = new byte[hsv.Width * hsv.Height];
-            for (int y = 0; y < height; ++y)
+            byte[] values = new byte[width * height];
+            Parallel.For(0, height, y =>
             {
+                long rowStart = y * step;
+                int arrayStart = y * width;
                 for (int x = 0; x < width; ++x)
                 {
-                    values[y * width + x] = (*(p + y * step + x * channels + channel));
+                    values[arrayStart + x] = *(p + rowStart + x * channels + channel);
                 }
-            }
+            });
 
             return values;
         }
@@ -240,99 +248,112 @@ namespace libimgengCore
 
         private unsafe void DrawHistogram(WriteableBitmap bitmap, int[] histogram, double maxFrequency, Func<int, byte> b, Func<int, byte> g, Func<int, byte> r)
         {
-            try
-            {
-                bitmap.Lock();
+            bitmap.Lock();
 
-                byte* p = (byte*)bitmap.BackBuffer.ToPointer();
-                int height = bitmap.PixelHeight;
-                int width = bitmap.PixelWidth;
-                int backbufferStride = bitmap.BackBufferStride;
-                for (int x = 0; x < width; ++x)
+            byte* p = (byte*)bitmap.BackBuffer.ToPointer();
+            int height = bitmap.PixelHeight;
+            int width = bitmap.PixelWidth;
+            int backbufferStride = bitmap.BackBufferStride;
+
+            for (int x = 0; x < width; ++x)
+            {
+                int count = histogram[x];
+                int barHeight = (int)(count / maxFrequency * height);
+
+                for (int y = 0; y < barHeight; ++y)
                 {
-                    int count = histogram[x];
-                    for (int y = 0; y < height; ++y)
-                    {
-                        if (y <= (int)(count / maxFrequency * height))
-                        {
-                            *(p + x * 3 + (height - y) * backbufferStride + 0) = b(x);
-                            *(p + x * 3 + (height - y) * backbufferStride + 1) = g(x);
-                            *(p + x * 3 + (height - y) * backbufferStride + 2) = r(x);
-                        }
-                        else
-                        {
-                            *(p + x * 3 + (height - y) * backbufferStride + 0) = 0;
-                            *(p + x * 3 + (height - y) * backbufferStride + 1) = 0;
-                            *(p + x * 3 + (height - y) * backbufferStride + 2) = 0;
-                        }
-                    }
+                    byte* pixel = p + x * 3 + (height - y - 1) * backbufferStride;
+                    pixel[0] = b(x);
+                    pixel[1] = g(x);
+                    pixel[2] = r(x);
                 }
 
-                bitmap.AddDirtyRect(new Int32Rect(0, 0, width, height));
+                for (int y = barHeight; y < height; ++y)
+                {
+                    byte* pixel = p + x * 3 + (height - y - 1) * backbufferStride;
+                    pixel[0] = 0;
+                    pixel[1] = 0;
+                    pixel[2] = 0;
+                }
             }
-            finally
-            {
-                bitmap.Unlock();
-            }
+
+            bitmap.AddDirtyRect(new Int32Rect(0, 0, width, height));
+            bitmap.Unlock();
         }
 
         private unsafe void DrawHistogramLog10(WriteableBitmap bitmap, int[] histogram, double maxFrequency, Func<int, byte> b, Func<int, byte> g, Func<int, byte> r)
         {
-            try
-            {
-                bitmap.Lock();
+            bitmap.Lock();
 
-                byte* p = (byte*)bitmap.BackBuffer.ToPointer();
-                int height = bitmap.PixelHeight;
-                int width = bitmap.PixelWidth;
-                int backbufferStride = bitmap.BackBufferStride;
-                for (int x = 0; x < width; ++x)
+            byte* p = (byte*)bitmap.BackBuffer.ToPointer();
+            int height = bitmap.PixelHeight;
+            int width = bitmap.PixelWidth;
+            int backbufferStride = bitmap.BackBufferStride;
+            double log10_maxFrequency = Math.Log10(maxFrequency);
+
+            for (int x = 0; x < width; ++x)
+            {
+                int count = histogram[x];
+                double log10_count = count > 0 ? Math.Log10(count) : 0; // 0を防ぐ
+                int barHeight = (int)(log10_count / log10_maxFrequency * height);
+
+                for (int y = 0; y < barHeight; ++y)
                 {
-                    int count = histogram[x];
-                    double log10_count = Math.Log10(count);
-                    double log10_maxFrequency = Math.Log10(maxFrequency);
-                    for (int y = 0; y < height; ++y)
-                    {
-                        if (y <= (int)(log10_count / log10_maxFrequency * (double)height))
-                        {
-                            *(p + x * 3 + (height - y) * backbufferStride + 0) = b(x);
-                            *(p + x * 3 + (height - y) * backbufferStride + 1) = g(x);
-                            *(p + x * 3 + (height - y) * backbufferStride + 2) = r(x);
-                        }
-                        else
-                        {
-                            *(p + x * 3 + (height - y) * backbufferStride + 0) = 0;
-                            *(p + x * 3 + (height - y) * backbufferStride + 1) = 0;
-                            *(p + x * 3 + (height - y) * backbufferStride + 2) = 0;
-                        }
-                    }
+                    byte* pixel = p + x * 3 + (height - y - 1) * backbufferStride;
+                    pixel[0] = b(x);
+                    pixel[1] = g(x);
+                    pixel[2] = r(x);
                 }
 
-                bitmap.AddDirtyRect(new Int32Rect(0, 0, width, height));
+                for (int y = barHeight; y < height; ++y)
+                {
+                    byte* pixel = p + x * 3 + (height - y - 1) * backbufferStride;
+                    pixel[0] = 0;
+                    pixel[1] = 0;
+                    pixel[2] = 0;
+                }
             }
-            finally
-            {
-                bitmap.Unlock();
-            }
+
+            bitmap.AddDirtyRect(new Int32Rect(0, 0, width, height));
+            bitmap.Unlock();
         }
 
         private unsafe int[] CreateHistogram(Mat mat, int channel, int bin)
         {
-            int[] histogram = new int[bin];
+            // ローカルヒストグラムの配列を初期化
+            int[][] localHistograms = new int[Environment.ProcessorCount][];
+            for (int i = 0; i < localHistograms.Length; i++)
+            {
+                localHistograms[i] = new int[bin];
+            }
 
             byte* p = (byte*)mat.Data.ToPointer();
             int rows = mat.Rows;
             int cols = mat.Cols;
             long step = mat.Step();
             int channels = mat.Channels();
-            for (int y = 0; y < rows; ++y)
+
+            // 並列処理で各行を処理
+            Parallel.For(0, rows, (y, state) =>
             {
-                int ar_y = y * cols;
+                int threadIndex = Thread.CurrentThread.ManagedThreadId % Environment.ProcessorCount;
+                int[] threadHistogram = localHistograms[threadIndex];
+
                 long mat_y = y * step;
                 for (int x = 0; x < cols; ++x)
                 {
                     byte value = *(p + mat_y + x * channels + channel);
-                    histogram[value] = histogram[value] + 1;
+                    threadHistogram[value]++;
+                }
+            });
+
+            // 全てのローカルヒストグラムを合算
+            int[] histogram = new int[bin];
+            foreach (var localHistogram in localHistograms)
+            {
+                for (int i = 0; i < bin; i++)
+                {
+                    histogram[i] += localHistogram[i];
                 }
             }
 

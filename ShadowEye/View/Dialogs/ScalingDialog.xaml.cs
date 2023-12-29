@@ -150,8 +150,8 @@ namespace ShadowEye.View.Dialogs
                 }
                 else
                 {
-                    ScalingDialogVM.Width = bitmap.Width;
-                    ScalingDialogVM.Height = bitmap.Height;
+                    ScalingDialogVM.Width = bitmap.Value.Width;
+                    ScalingDialogVM.Height = bitmap.Value.Height;
                 }
             }
         }

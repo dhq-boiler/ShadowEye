@@ -518,6 +518,10 @@ namespace ShadowEye.Utils
             MONITOR_DEFAULTTONEAREST = 0x00000002
         }
 
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
+
         #endregion
 
         #region gdi32.dll
@@ -545,6 +549,7 @@ namespace ShadowEye.Utils
 
         [DllImport("gdi32.dll")]
         public static extern bool GdiFlush();
+
         #endregion
     }
 }

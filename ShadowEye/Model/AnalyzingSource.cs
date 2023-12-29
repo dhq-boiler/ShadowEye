@@ -1,32 +1,49 @@
-
-
-using libimgengCore;
 using OpenCvSharp;
-using OpenCvSharp.Extensions;
+using OpenCvSharp.WpfExtensions;
+using Reactive.Bindings;
+using Reactive.Bindings.Disposables;
+using Reactive.Bindings.Extensions;
+using ShadowEye.Utils;
+using ShadowEye.View;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
-using ShadowEye.Utils;
-using OpenCvSharp.WpfExtensions;
-using ShadowEye.View;
 
 namespace ShadowEye.Model
 {
     public abstract class AnalyzingSource : Notifier, IDisposable, IToggle
     {
+        private CompositeDisposable _disposables = new();
         private Uri _location;
-        private Mat _mat;
         private WriteableBitmap _bitmap;
         private bool _disposed;
         private string _Name;
         private bool _IsEnable = true;
-        private HashSet<AnalyzingSource> _RequestDiscadedMat;
+        private List<AnalyzingSource> _RequestDiscadedMat;
 
         private AnalyzingSource()
         {
-            _RequestDiscadedMat = new HashSet<AnalyzingSource>();
+            _RequestDiscadedMat = new List<AnalyzingSource>();
+            Mat.Zip(Mat.Skip(1), (Old, New) => new { OldItem = Old, NewItem = New })
+                .Subscribe(pair =>
+                {
+
+                    if (_RequestDiscadedMat.Any() && _RequestDiscadedMat.Last().Equals(this))
+                    {
+                        var discaded = pair.OldItem;
+
+                        lock (discaded)
+                        {
+                            discaded.Dispose();
+                        }
+                    }
+
+                    OnMatChanged(this, new MatChangedEventArgs(pair.OldItem));
+                }).AddTo(_disposables);
         }
 
         protected AnalyzingSource(string name) : this()
@@ -49,42 +66,7 @@ namespace ShadowEye.Model
             }
         }
 
-        public Mat Mat
-        {
-            get
-            {
-                if (_mat == null || _mat.IsDisposed)
-                    return null;
-                else
-                    return _mat;
-            }
-            set
-            {
-                Mat discaded = null;
-
-                if (_mat != null && !_mat.IsDisposed)
-                {
-                    if (IsRequestedDiscadedMat)
-                    {
-                        discaded = _mat;
-                    }
-                    else if (this is FilmSource)
-                    {
-                        //do not dispose
-                    }
-                    else
-                    {
-                        _mat.Dispose();
-                        Trace.WriteLine(string.Format("{0}", Name), "MatDisposed");
-                    }
-                }
-
-                SetProperty<Mat>(ref _mat, value, "Mat");
-
-                if (value != null)
-                    OnMatChanged(this, new MatChangedEventArgs(discaded));
-            }
-        }
+        public ReactivePropertySlim<Mat> Mat { get; } = new();
 
         public Updater HowToUpdate { get; set; }
 
@@ -98,43 +80,42 @@ namespace ShadowEye.Model
             _RequestDiscadedMat.Remove(source);
         }
 
-        private bool IsRequestedDiscadedMat { get { return _RequestDiscadedMat.Count() > 0; } }
+        private bool IsRequestedDiscadedMat => _RequestDiscadedMat.Any();
 
         protected void SetBitmapFromMat(Mat mat)
         {
+            if (App.Current is null)
+                return;
+
             try
             {
-                WriteableBitmapConverter.ToWriteableBitmap(mat, Bitmap);
-            }
-            catch (ArgumentException)
-            {
-                Bitmap = WriteableBitmapConverter.ToWriteableBitmap(mat);
-            }
-        }
-
-        public WriteableBitmap Bitmap
-        {
-            get { return _bitmap; }
-            set
-            {
-                SetProperty<WriteableBitmap>(ref _bitmap, value, "Bitmap");
-                if (value != null)
+                App.Current.Dispatcher.Invoke(() =>
                 {
-                    OnBitmapChanged(this, new EventArgs());
-                    OnPropertyChanged("BitsPerPixel");
-                    OnPropertyChanged("Bits");
-                    OnPropertyChanged("Channels");
-                }
+                    lock (mat)
+                    {
+                        if (mat.IsDisposed)
+                            return;
+
+                        Bitmap.Value = mat.ToWriteableBitmap();
+                    }
+                });
+            }
+            catch (TaskCanceledException e)
+            {
+                //ˆ¬‚è’×‚µ
+                return;
             }
         }
 
-        public ChannelType ChannelType { get; set; }
+        public ReactivePropertySlim<WriteableBitmap> Bitmap { get; } = new();
+
+        public libimgengCore.ChannelType ChannelType { get; set; }
 
         public int BitsPerPixel
         {
             get
             {
-                if (Mat != null)
+                if (Mat.Value != null)
                     return Bits * Channels;
                 else
                     return 0;
@@ -145,8 +126,8 @@ namespace ShadowEye.Model
         {
             get
             {
-                if (Mat != null)
-                    return Mat.Depth();
+                if (Mat.Value != null)
+                    return Mat.Value.Depth();
                 else
                     return 0;
             }
@@ -156,8 +137,8 @@ namespace ShadowEye.Model
         {
             get
             {
-                if (Mat != null)
-                    return Mat.Channels();
+                if (Mat.Value != null)
+                    return Mat.Value.Channels();
                 else
                     return 0;
             }
@@ -171,16 +152,18 @@ namespace ShadowEye.Model
 
         public void UpdateDisplay()
         {
-            if (Mat.Cols == 0 || Mat.Rows == 0)
+            if (Mat.Value.IsDisposed || Mat.Value.Cols == 0 || Mat.Value.Rows == 0)
                 return;
-            SetBitmapFromMat(Mat);
-            OnSourceUpdated(this, new EventArgs());
+            SetBitmapFromMat(Mat.Value);
         }
 
         protected bool IsShowingCurrentTab()
         {
-            return (App.Current.MainWindow as MainWindow).MainWindowVM.ImageContainerVM.SelectedImageVM != null
-                && (App.Current.MainWindow as MainWindow).MainWindowVM.ImageContainerVM.SelectedImageVM.Source.Equals(this);
+            return App.Current is not null &&
+                   App.Current.Dispatcher.Invoke(() =>
+                MainWindow.MainWindowVM.ImageContainerVM.SelectedImageVM != null
+                && MainWindow.MainWindowVM.ImageContainerVM.SelectedImageVM.Source
+                .Equals(this));
         }
 
         public abstract void UpdateImage();
@@ -230,6 +213,8 @@ namespace ShadowEye.Model
         {
             if (MatChanged != null)
                 MatChanged(this, e);
+
+            OnSourceUpdated(sender, e);
         }
 
         public event EventHandler BitmapChanged;
@@ -237,6 +222,8 @@ namespace ShadowEye.Model
         {
             if (BitmapChanged != null)
                 BitmapChanged(this, e);
+
+            OnSourceUpdated(sender, e);
         }
 
         public event EventHandler SourceUpdated;
@@ -259,13 +246,20 @@ namespace ShadowEye.Model
             {
                 if (disposing)
                 {
-                    Bitmap = null;
                 }
 
-                if (_mat != null)
+                _disposables.Dispose();
+
+                Bitmap?.Dispose();
+
+                var mat = Mat.Value;
+
+                if (mat is not null)
                 {
-                    _mat.Dispose();
-                    _mat = null;
+                    lock (mat)
+                    {
+                        mat?.Dispose();
+                    }
                 }
 
                 _disposed = true;
