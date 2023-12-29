@@ -5,6 +5,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -319,23 +320,42 @@ namespace libimgengCore
 
         private unsafe int[] CreateHistogram(Mat mat, int channel, int bin)
         {
-            int[] histogram = new int[bin];
+            // ローカルヒストグラムの配列を初期化
+            int[][] localHistograms = new int[Environment.ProcessorCount][];
+            for (int i = 0; i < localHistograms.Length; i++)
+            {
+                localHistograms[i] = new int[bin];
+            }
 
             byte* p = (byte*)mat.Data.ToPointer();
             int rows = mat.Rows;
             int cols = mat.Cols;
             long step = mat.Step();
             int channels = mat.Channels();
-            Parallel.For(0, rows, y =>
+
+            // 並列処理で各行を処理
+            Parallel.For(0, rows, (y, state) =>
             {
-                int ar_y = y * cols;
+                int threadIndex = Thread.CurrentThread.ManagedThreadId % Environment.ProcessorCount;
+                int[] threadHistogram = localHistograms[threadIndex];
+
                 long mat_y = y * step;
                 for (int x = 0; x < cols; ++x)
                 {
                     byte value = *(p + mat_y + x * channels + channel);
-                    histogram[value] = histogram[value] + 1;
+                    threadHistogram[value]++;
                 }
             });
+
+            // 全てのローカルヒストグラムを合算
+            int[] histogram = new int[bin];
+            foreach (var localHistogram in localHistograms)
+            {
+                for (int i = 0; i < bin; i++)
+                {
+                    histogram[i] += localHistogram[i];
+                }
+            }
 
             return histogram;
         }
